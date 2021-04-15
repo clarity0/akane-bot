@@ -12,6 +12,10 @@ use serenity::{
 };
 use tokio::time::sleep;
 
+#[macro_use] extern crate diesel;
+mod schema;
+mod models;
+mod database;
 mod commands;
 use commands::general::*;
 use commands::moderator::*;

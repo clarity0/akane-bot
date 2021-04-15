@@ -10,4 +10,5 @@ edition = "2018"
 serenity = "0.10"
 tokio = { version = "1.5", features = ["full"] }
 dotenv = "0.15"
-diesel = { version = "1.4", features = ["postgres"] }
+diesel = { version = "1.4", features = ["sqlite"] }
+chrono = "0.4"
