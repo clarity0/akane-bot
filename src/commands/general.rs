@@ -60,13 +60,12 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
                     let latency = latency.as_millis();
                     msg.reply(ctx, &format!("My latency is {} ms", latency)).await?;
                 } else {
-                    msg.reply(ctx, "Error: Try again in 30 seconds").await?;
+                    msg.reply(ctx, "Try again in 30 seconds").await?;
                 }
             } else {
                 msg.reply(ctx,  "Error: No shard found").await?;
             }
         }
-
         None => {
             msg.reply(ctx, "Error: There was a problem getting the shard manager").await?;
         }
