@@ -19,10 +19,12 @@ use crate::shard_manager;
 use shard_manager::ShardManagerContainer;
 
 #[group]
+#[only_in(guilds)]
 #[commands(ping, say, latency)]
 struct General;
 
 #[command]
+#[owners_only]
 async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     // Replace unsafe content with safe content
     let settings = if let Some(guild_id) = msg.guild_id {

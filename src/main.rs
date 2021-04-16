@@ -4,6 +4,7 @@ mod models;
 mod database;
 mod commands;
 mod handler;
+mod util;
 mod shard_manager;
 
 use std::{env::var, sync::Arc};
