@@ -1,4 +1,5 @@
 #[derive(Queryable)]
+#[derive(Debug)]
 pub struct Ban {
 	pub user_id: String,
 	pub user_handle: String,

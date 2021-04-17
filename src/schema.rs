@@ -1,7 +1,7 @@
 table! {
     banlist (user_id) {
-        user_id -> Text,
-        user_handle -> Nullable<Text>,
+        user_id -> Varchar,
+        user_handle -> Varchar,
         ban_date -> Text,
     }
 }
