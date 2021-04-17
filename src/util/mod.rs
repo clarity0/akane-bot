@@ -14,6 +14,6 @@ pub fn utc_date_now_string() -> String {
 	)
 }
 
-pub fn user_handle(user: User) -> String {
+pub fn user_handle(user: &User) -> String {
 	format!("{}#{}", user.name, user.discriminator)
 }
