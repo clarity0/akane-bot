@@ -33,7 +33,7 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 			user_handle: format!("{}#{}", user.name, user.discriminator),
 			ban_date: utc_date_now_string(),
 		};
-		add_ban(&conn, &new_ban);
+		println!("{:?}", add_ban(&conn, &new_ban));
 	} else {
 		msg.channel_id.say(ctx, "Failed to ban: user not found").await?;
 	}
