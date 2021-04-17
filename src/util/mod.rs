@@ -1,3 +1,5 @@
+use serenity::model::prelude::User;
+
 pub fn utc_date_now_string() -> String {
 	use chrono::{Datelike, Timelike, Utc};
 	let now = Utc::now();
@@ -10,4 +12,8 @@ pub fn utc_date_now_string() -> String {
 		now.second(),
 		now.timezone()
 	)
+}
+
+pub fn user_handle(user: User) -> String {
+	format!("{}#{}", user.name, user.discriminator)
 }
