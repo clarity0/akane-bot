@@ -95,8 +95,12 @@ async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		let user = UserId::from(user_id).to_user(&ctx).await?;
 		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		let mut user_as_member = guild.member(&ctx, user_id).await?;
-
+		
 		if let Some(role)  = guild.role_by_name("Muted") {
+			if !user_as_member.roles.contains(&role.id) {
+				msg.channel_id.say(ctx, format!("User {} is already not muted", user_handle(&user))).await?;
+				return Ok(())
+			}
 			if let Err(err) = user_as_member.remove_role(&ctx, role.id).await {
 				msg.channel_id.say(ctx, format!("Cannot mute user {}", user_handle(&user))).await?;
 				println!("{}", err);
