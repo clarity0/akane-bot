@@ -22,6 +22,14 @@ pub fn log_ban<'a>(user: &User, guild: Guild) -> Result<Ban, Error> {
 		.get_result(&conn)
 }
 
+pub fn log_unban<'a>(user: &User, guild: Guild) -> Result<Ban, Error> {
+	let conn = establish_connection();
+	diesel::delete(banlist::table)
+		.filter(banlist::user_id.eq(user.id.to_string()))
+		.filter(banlist::server_id.eq(guild.id.to_string()))
+		.get_result(&conn)
+}
+
 pub fn log_mute<'a>(user: &User, guild: Guild) -> Result<Mute, Error> {
 	let conn = establish_connection();
 	let new_mute = NewMute {
@@ -32,5 +40,13 @@ pub fn log_mute<'a>(user: &User, guild: Guild) -> Result<Mute, Error> {
 	};
 	diesel::insert_into(mutelist::table)
 		.values(&new_mute)
+		.get_result(&conn)
+}
+
+pub fn log_unmute<'a>(user: &User, guild: Guild) -> Result<Ban, Error> {
+	let conn = establish_connection();
+	diesel::delete(mutelist::table)
+		.filter(mutelist::user_id.eq(user.id.to_string()))
+		.filter(mutelist::server_id.eq(guild.id.to_string()))
 		.get_result(&conn)
 }
