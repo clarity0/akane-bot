@@ -2,16 +2,13 @@ use serenity::{client::Context, framework::standard::{
 		Args,
 		CommandResult,
 		macros::{command, group,},
-	}, model::{
-		channel::Message,
-		id::UserId,
-	}, utils::parse_username};
-use crate::database::*;
-use crate::util::user_handle;
+	}, model::{channel::{Message}, id::UserId}, utils::parse_username};
+use crate::{database::*, util::{user_handle,string_to_mention}};
+
 #[group]
 #[allowed_roles("Moderator",)]
 #[only_in(guilds)]
-#[commands(ban,unban,mute,unmute)]
+#[commands(ban,unban,mute,unmute,uinfo)]
 struct Moderator;
 
 #[command]
@@ -31,7 +28,7 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		 	}
 		}
 	} else {
-		msg.channel_id.say(ctx, "Failed to ban: user not found").await?;
+		msg.channel_id.say(ctx, "User not found").await?;
 	}
 	Ok(())
 }
@@ -53,7 +50,7 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		 	}
 		}
 	} else {
-		msg.channel_id.say(ctx, "Failed to unban: user not found").await?;
+		msg.channel_id.say(ctx, "User not found").await?;
 	}
 	Ok(())
 }
@@ -83,7 +80,7 @@ async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 			println!("Muted role does not exist");
 		}
 	} else {
-		msg.channel_id.say(ctx, "Failed to ban: user not found").await?;
+		msg.channel_id.say(ctx, "User not found").await?;
 	}
 	Ok(())
 }
@@ -117,7 +114,29 @@ async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 			println!("Muted role does not exist");
 		}
 	} else {
-		msg.channel_id.say(ctx, "Failed to unmute: user not found").await?;
+		msg.channel_id.say(ctx, "User not found").await?;
+	}
+	Ok(())
+}
+
+#[command]
+#[aliases(dox,)]
+async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	if let Some(user_id) = parse_username(string_to_mention(args.message()).unwrap_or("".to_string())) {
+		let user = UserId::from(user_id).to_user(&ctx).await?;
+		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
+		let nick = user.nick_in(&ctx, guild.id).await.ok_or("Error retrieving nick")?;
+		msg.channel_id.send_message(&ctx, |m| {
+			m.embed(|e| e
+				.title(format!("{}", user_handle(&user)))
+				.description("User Info")
+				.thumbnail(user.avatar_url().unwrap())
+				.field("UserID", user_id, false)
+				.field("Nick", nick, false)
+			)	
+		}).await?;
+ 	} else {
+		msg.channel_id.say(&ctx,"User not found").await?;
 	}
 	Ok(())
 }
