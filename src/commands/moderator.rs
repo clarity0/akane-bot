@@ -15,7 +15,7 @@ use crate::{database::*, util::{user_handle,string_to_user_id}};
 #[group]
 #[allowed_roles("Moderator",)]
 #[only_in(guilds)]
-#[commands(ban,unban,mute,unmute,uinfo)]
+#[commands(ban,unban,mute,unmute,uinfo,avatar,)]
 struct Moderator;
 
 #[command]
@@ -140,6 +140,29 @@ async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				.field("Nick", nick, false)
 			)	
 		}).await?;
+ 	} else {
+		msg.channel_id.say(&ctx,"User not found").await?;
+	}
+	Ok(())
+}
+
+#[command]
+#[aliases(avi, pfp,)]
+async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	if let Some(user_id) = string_to_user_id(args.message()) {
+		let user = UserId::from(user_id).to_user(&ctx).await?;
+		let user_handle = user_handle(&user);
+		if let Some(avatar_url) = user.avatar_url()  {
+			msg.channel_id.send_message(&ctx, |m| {
+				m.embed(|e| e
+					.title(&user_handle)
+					.description(format!("Avatar for {}", &user_handle))
+					.image(&avatar_url)
+				)	
+			}).await?;
+		} else {
+			msg.channel_id.say(&ctx,format!("Could not retrieve avatar url for {}", user_handle)).await?;
+		}
  	} else {
 		msg.channel_id.say(&ctx,"User not found").await?;
 	}
