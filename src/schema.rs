@@ -3,7 +3,7 @@ table! {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
-        date -> Text,
+        date -> Timestamp,
     }
 }
 
@@ -12,7 +12,7 @@ table! {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
-        date -> Text,
+        date -> Timestamp,
     }
 }
 
