@@ -1,18 +1,5 @@
 use std::num::ParseIntError;
 use serenity::{model::prelude::User, utils::parse_username};
-use chrono::{Datelike, Timelike, Utc};
-
-pub fn utc_date_now_string() -> String {
-	let now = Utc::now();
-	format!("{}-{:02}-{:02} {:02}:{:02}:{:02}",
-		now.year(),
-		now.month(),
-		now.day(),
-		now.hour(),
-		now.minute(),
-		now.second(),
-	)
-}
 
 pub fn user_handle(user: &User) -> String {
 	format!("{}#{}", user.name, user.discriminator)
