@@ -6,7 +6,7 @@ pub struct Ban {
 	pub user_id: String,
 	pub server_id: String,
 	pub user_handle: String,
-	pub ban_date: String,
+	pub date: String,
 }
 
 #[derive(Insertable)]
@@ -15,7 +15,7 @@ pub struct NewBan<'a> {
     pub user_id: &'a str,
 	pub server_id: &'a str,
     pub user_handle: &'a str,
-	pub ban_date: &'a str,
+	pub date: &'a str,
 }
 
 #[derive(Queryable)]
@@ -24,7 +24,7 @@ pub struct Mute {
 	pub user_id: String,
 	pub server_id: String,
 	pub user_handle: String,
-	pub mute_date: String,
+	pub date: String,
 }
 
 #[derive(Insertable)]
@@ -33,5 +33,5 @@ pub struct NewMute<'a> {
     pub user_id: &'a str,
 	pub server_id: &'a str,
     pub user_handle: &'a str,
-	pub mute_date: &'a str,
+	pub date: &'a str,
 }

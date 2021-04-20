@@ -3,7 +3,7 @@ table! {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
-        ban_date -> Text,
+        date -> Text,
     }
 }
 
@@ -12,7 +12,7 @@ table! {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
-        mute_date -> Text,
+        date -> Text,
     }
 }
 
