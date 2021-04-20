@@ -1,8 +1,8 @@
+use chrono::Utc;
 use diesel::{prelude::*, result::Error};
 use serenity::model::{guild::Guild, prelude::User};
 use crate::{models::{Ban, NewBan, Mute, NewMute}, util::user_handle};
 use crate::schema::{banlist,mutelist};
-use crate::util::utc_date_now_string;
 
 pub fn establish_connection() -> PgConnection {
 	let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not set");
@@ -15,7 +15,7 @@ pub fn log_ban<'a>(user: &User, guild: Guild) -> Result<Ban, Error> {
 		user_id: &user.id.to_string(),
 		server_id: &guild.id.to_string(),
 		user_handle: &user_handle(user),
-		date: &utc_date_now_string(),
+		date: Utc::now().naive_utc(),
 	};
 	diesel::insert_into(banlist::table)
 		.values(&new_ban)
@@ -36,14 +36,14 @@ pub fn log_mute<'a>(user: &User, guild: Guild) -> Result<Mute, Error> {
 		user_id: &user.id.to_string(),
 		server_id: &guild.id.to_string(),
 		user_handle: &user_handle(user),
-		date: &utc_date_now_string(),
+		date: Utc::now().naive_utc(),
 	};
 	diesel::insert_into(mutelist::table)
 		.values(&new_mute)
 		.get_result(&conn)
 }
 
-pub fn log_unmute<'a>(user: &User, guild: Guild) -> Result<Ban, Error> {
+pub fn log_unmute<'a>(user: &User, guild: Guild) -> Result<Mute, Error> {
 	let conn = establish_connection();
 	diesel::delete(mutelist::table)
 		.filter(mutelist::user_id.eq(user.id.to_string()))
