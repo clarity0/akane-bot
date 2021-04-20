@@ -9,7 +9,6 @@ use serenity::{
 	},
 	model::channel::Message,
 };
-
 use crate::shard_manager;
 use shard_manager::ShardManagerContainer;
 
