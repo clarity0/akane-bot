@@ -1,9 +1,16 @@
-use serenity::{client::Context, framework::standard::{
+use serenity::{
+	client::Context,
+	framework::standard::{
 		Args,
 		CommandResult,
 		macros::{command, group,},
-	}, model::{channel::{Message}, id::UserId}, utils::parse_username};
-use crate::{database::*, util::{user_handle,string_to_mention}};
+	},
+	model::{
+		channel::Message,
+		id::UserId
+	}
+};
+use crate::{database::*, util::{user_handle,string_to_user_id}};
 
 #[group]
 #[allowed_roles("Moderator",)]
@@ -14,7 +21,7 @@ struct Moderator;
 #[command]
 #[aliases(exile,)]
 async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Some(user_id) = parse_username(args.message()) {
+	if let Some(user_id) = string_to_user_id(args.message()) {
 		let user = UserId::from(user_id).to_user(&ctx).await?;
 		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		
@@ -36,7 +43,7 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(repatriate,)]
 async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Some(user_id) = parse_username(args.message()) {
+	if let Some(user_id) = string_to_user_id(args.message()) {
 		let user = UserId::from(user_id).to_user(&ctx).await?;
 		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		
@@ -58,7 +65,7 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(silence,)]
 async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Some(user_id) = parse_username(args.message()) {
+	if let Some(user_id) = string_to_user_id(args.message()) {
 		let user = UserId::from(user_id).to_user(&ctx).await?;
 		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		let mut user_as_member = guild.member(&ctx, user_id).await?;
@@ -88,12 +95,12 @@ async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(unsilence,)]
 async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Some(user_id) = parse_username(args.message()) {
+	if let Some(user_id) = string_to_user_id(args.message()) {
 		let user = UserId::from(user_id).to_user(&ctx).await?;
 		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		let mut user_as_member = guild.member(&ctx, user_id).await?;
 		
-		if let Some(role)  = guild.role_by_name("Muted") {
+		if let Some(role) = guild.role_by_name("Muted") {
 			if !user_as_member.roles.contains(&role.id) {
 				msg.channel_id.say(ctx, format!("User {} is already not muted", user_handle(&user))).await?;
 				return Ok(())
@@ -103,12 +110,10 @@ async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				println!("{}", err);
 			} else {
 				match log_unmute(&user, guild) {
-					Ok(mute) => {
-						println!("Unmuted user:\n{:?}\n------", mute);
-						msg.channel_id.say(ctx, format!("Unmuted user {}", user_handle(&user))).await?;
-					},
+					Ok(mute) => println!("Unmuted user:\n{:?}", mute),
 					Err(err) => println!("Error deleting from db: {}", err),
 				}
+				msg.channel_id.say(ctx, format!("Unmuted user {}", user_handle(&user))).await?;
 			}
 		} else {
 			println!("Muted role does not exist");
@@ -122,7 +127,7 @@ async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(dox,)]
 async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Some(user_id) = parse_username(string_to_mention(args.message()).unwrap_or("".to_string())) {
+	if let Some(user_id) = string_to_user_id(args.message()) {
 		let user = UserId::from(user_id).to_user(&ctx).await?;
 		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		let nick = user.nick_in(&ctx, guild.id).await.ok_or("Error retrieving nick")?;

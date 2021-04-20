@@ -15,7 +15,7 @@ pub fn log_ban<'a>(user: &User, guild: Guild) -> Result<Ban, Error> {
 		user_id: &user.id.to_string(),
 		server_id: &guild.id.to_string(),
 		user_handle: &user_handle(user),
-		ban_date: &utc_date_now_string(),
+		date: &utc_date_now_string(),
 	};
 	diesel::insert_into(banlist::table)
 		.values(&new_ban)
@@ -36,7 +36,7 @@ pub fn log_mute<'a>(user: &User, guild: Guild) -> Result<Mute, Error> {
 		user_id: &user.id.to_string(),
 		server_id: &guild.id.to_string(),
 		user_handle: &user_handle(user),
-		mute_date: &utc_date_now_string(),
+		date: &utc_date_now_string(),
 	};
 	diesel::insert_into(mutelist::table)
 		.values(&new_mute)

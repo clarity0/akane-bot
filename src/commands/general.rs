@@ -4,15 +4,10 @@ use serenity::{
         bridge::gateway::ShardId,
     },
 	framework::standard::{
-		Args, 
 		CommandResult,
 		macros::{command, group,}
 	},
 	model::channel::Message,
-	utils::{
-		ContentSafeOptions,
-		content_safe,
-	},
 };
 
 use crate::shard_manager;
@@ -20,27 +15,8 @@ use shard_manager::ShardManagerContainer;
 
 #[group]
 #[only_in(guilds)]
-#[commands(ping, say, latency)]
+#[commands(ping, latency)]
 struct General;
-
-#[command]
-#[owners_only]
-async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    // Replace unsafe content with safe content
-    let settings = if let Some(guild_id) = msg.guild_id {
-        ContentSafeOptions::default()
-            .clean_channel(false)
-            .display_as_member_from(guild_id)
-    } else {
-        ContentSafeOptions::default()
-            .clean_channel(false)
-            .clean_role(false)
-    };
-
-    let content = content_safe(&ctx.cache, &args.rest(), &settings).await;
-    msg.channel_id.say(&ctx.http, &content).await?;
-    Ok(())
-}
 
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
