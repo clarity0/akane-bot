@@ -1,7 +1,7 @@
 use chrono::Utc;
 use diesel::{prelude::*, result::Error};
 use serenity::model::{guild::Guild, prelude::User};
-use crate::{models::{Ban, NewBan, Mute, NewMute}, util::user_handle};
+use crate::{models::{Ban, NewBan, Mute, NewMute}};
 use crate::schema::{banlist,mutelist};
 
 pub fn establish_connection() -> Result<PgConnection, ConnectionError> {
@@ -13,7 +13,7 @@ pub fn log_ban(user: &User, guild: Guild) -> Result<Ban, Error> {
 		let new_ban = NewBan {
 			user_id: &user.id.to_string(),
 			server_id: &guild.id.to_string(),
-			user_handle: &user_handle(user),
+			user_handle: &user.tag(),
 			date: Utc::now().naive_utc(),
 		};
 		diesel::insert_into(banlist::table)
@@ -40,7 +40,7 @@ pub fn log_mute(user: &User, guild: Guild) -> Result<Mute, Error> {
 		let new_mute = NewMute {
 			user_id: &user.id.to_string(),
 			server_id: &guild.id.to_string(),
-			user_handle: &user_handle(user),
+			user_handle: &user.tag(),
 			date: Utc::now().naive_utc(),
 		};
 		diesel::insert_into(mutelist::table)

@@ -1,14 +1,8 @@
-use serenity::{model::prelude::User};
-
-pub fn user_handle(user: &User) -> String {
-	format!("{}#{}", user.name, user.discriminator)
-}
-
+use serenity::{client::Context, framework::standard::CommandResult, model::{channel::Message}};
 pub enum Log<'a> {
 	Success(&'a str),
 	Error(&'a str),
 }
-use serenity::{client::Context, framework::standard::CommandResult, model::{channel::Message}};
 
 pub async fn log_command<'a>(message: Log<'a>, ctx: &Context, cmd_msg: &Message) -> CommandResult {
 	match message {
@@ -23,9 +17,9 @@ pub async fn log_command<'a>(message: Log<'a>, ctx: &Context, cmd_msg: &Message)
 			if let Some(guild) = cmd_msg.guild(&ctx).await {
 				if let Some(channel_id) = guild.channel_id_from_name(&ctx, "akane-logging").await {
 					let cmd_msg = cmd_msg.content_safe(&ctx).await;
-					channel_id.send_message(&ctx, |m| 
-						m.embed(|e|
-							e.title("Command Error")
+					channel_id.send_message(&ctx, |m| m
+						.embed(|e| e
+							.title("Command Error")
 							.description(message)
 							.field("Command", cmd_msg, false)
 					)).await?;
