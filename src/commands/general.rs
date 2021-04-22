@@ -1,11 +1,24 @@
 use std::str::FromStr;
-
-use serenity::{client::{
+use serenity::{
+    client::{
         Context,
         bridge::gateway::ShardId,
-    }, framework::standard::{Args, CommandResult, macros::{command, group,}}, model::{channel::Message, id::UserId}};
+    },
+    framework::standard::{
+        Args,
+        CommandResult,
+        macros::{
+            command, group,
+        }
+    },
+    model::{
+        channel::Message,
+        id::UserId
+    }
+};
 use crate::{shard_manager, util::{log_command, Log,}};
 use shard_manager::ShardManagerContainer;
+
 #[group]
 #[only_in(guilds)]
 #[commands(ping, latency, avatar,)]
