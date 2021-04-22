@@ -27,7 +27,7 @@ ___
 1. Clone repository and run cargo run on directory
 1. Setup a postgresql instance
 2. Setup your custom bot app on discord and obtain its token
-3. Create a .env file defining with the following data
+3. Create a .env file with the following data
 	```
 	AKANE_BOT_TOKEN="YOUR BOT TOKEN"
 	DATABASE_URL=postgres://your@own/database
