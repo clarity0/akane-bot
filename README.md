@@ -23,7 +23,7 @@ Akane: Discord Bot written in Rust
 #### Avatar 
 `!avatar <user mention or id>`
 ___
-## Host yourself
+## Host yourself  for your own server
 1. Clone repository and build with cargo build
 	```
 	cargo build
