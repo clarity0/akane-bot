@@ -12,12 +12,12 @@ use serenity::{
 		id::UserId
 	}
 };
-use crate::{database::*, util::user_handle};
+use crate::{database::*, util::*};
 
 #[group]
 #[allowed_roles("Moderator",)]
 #[only_in(guilds)]
-#[commands(ban,unban,mute,unmute,uinfo,avatar,)]
+#[commands(ban,unban,mute,unmute,uinfo,)]
 struct Moderator;
 
 #[command]
@@ -27,19 +27,19 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.ban(&ctx, &user, 0).await {
-				msg.channel_id.say(ctx, format!("Cannot ban user {}", user_handle(&user))).await?;
-				println!("{}", err);
+				log_command(Log::Error(format!("could not ban user {} {}", user_handle(&user), err).as_str()), &ctx, &msg).await?;
 			} else {
-				match log_ban(&user, guild) {
-					Ok(ban) => println!("Banned user:\n{:?}\n------", ban),
-					Err(err) => println!("Error inserting to db: {}", err),
+				if let Err(err) = log_ban(&user, guild) {
+					log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
+				} else {
+					log_command(Log::Success(format!("banned user {}", user_handle(&user)).as_str()), &ctx, &msg).await?;
 				}
 			}
 		} else {
-			msg.channel_id.say(&ctx,"User not found").await?;
+			log_command(Log::Error("user not found"), &ctx, &msg).await?;
 		}
 	} else {
-		msg.channel_id.say(&ctx,"Could not parse user").await?;
+		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -51,19 +51,19 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.unban(&ctx, &user).await {
-				msg.channel_id.say(ctx, format!("Cannot unban user {}", user_handle(&user))).await?;
-				println!("{}", err);
+				log_command(Log::Error(format!("could not unban user {} {}", user_handle(&user), err).as_str()), &ctx, &msg).await?;
 			} else {
-				match log_unban(&user, guild) {
-					Ok(ban) => println!("Unbanned user:\n{:?}\n------", ban),
-					Err(err) => println!("Error deleting from db: {}", err),
+				if let Err(err) = log_unban(&user, guild) {
+					log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
+				} else {
+					log_command(Log::Success(format!("unbanned user {}", user_handle(&user)).as_str()), &ctx, &msg).await?;
 				}
 			}
 		} else {
-			msg.channel_id.say(&ctx,"User not found").await?;
+			log_command(Log::Error("user not found"), &ctx, &msg).await?;
 		}
 	} else {
-		msg.channel_id.say(&ctx,"Could not parse user").await?;
+		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -77,25 +77,22 @@ async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 			let mut user_as_member = guild.member(&ctx, user_id).await?;
 			if let Some(role)  = guild.role_by_name("Muted") {
 				if let Err(err) = user_as_member.add_role(&ctx, role.id).await {
-					msg.channel_id.say(ctx, format!("Cannot mute user {}", user_handle(&user))).await?;
-					println!("{}", err);
+					log_command(Log::Error(format!("could not mute user {} {}", user_handle(&user), err).as_str()), &ctx, &msg).await?;
 				} else {
-					match log_mute(&user, guild) {
-						Ok(mute) => {
-							println!("Muted user:\n{:?}\n------", mute);
-							msg.channel_id.say(ctx, format!("Muted user {}", user_handle(&user))).await?;
-						},
-						Err(err) => println!("Error inserting to db: {}", err),
+					if let Err(err) = log_mute(&user, guild) {
+						log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
+					} else {
+						log_command(Log::Success(format!("muted user {}", user_handle(&user)).as_str()), &ctx, &msg).await?;
 					}
 				}
 			} else {
 				println!("Muted role does not exist");
 			}
 		} else {
-			msg.channel_id.say(&ctx,"User not found").await?;
+			log_command(Log::Error("user not found"), &ctx, &msg).await?;
 		}
 	} else {
-		msg.channel_id.say(&ctx,"Could not parse user").await?;
+		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -109,27 +106,27 @@ async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 			let mut user_as_member = guild.member(&ctx, user_id).await?;
 			if let Some(role) = guild.role_by_name("Muted") {
 				if !user_as_member.roles.contains(&role.id) {
-					msg.channel_id.say(ctx, format!("User {} is already not muted", user_handle(&user))).await?;
+					log_command(Log::Error(format!("User {} is already not muted", user_handle(&user)).as_str()), &ctx, &msg).await?;
 					return Ok(())
 				}
 				if let Err(err) = user_as_member.remove_role(&ctx, role.id).await {
-					msg.channel_id.say(ctx, format!("Cannot mute user {}", user_handle(&user))).await?;
+					msg.channel_id.say(ctx, format!("could not unmute user {}", user_handle(&user))).await?;
 					println!("{}", err);
 				} else {
-					match log_unmute(&user, guild) {
-						Ok(mute) => println!("Unmuted user:\n{:?}", mute),
-						Err(err) => println!("Error deleting from db: {}", err),
+					if let Err(err) = log_unmute(&user, guild) {
+						log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
+					} else {
+						log_command(Log::Success(format!("unmuted user {}", user_handle(&user)).as_str()), &ctx, &msg).await?;
 					}
-					msg.channel_id.say(ctx, format!("Unmuted user {}", user_handle(&user))).await?;
 				}
 			} else {
-				println!("Muted role does not exist");
+				log_command(Log::Error("muted role does not exist"), &ctx, &msg).await?;
 			}
 		} else {
-			msg.channel_id.say(&ctx,"User not found").await?;
+			log_command(Log::Error("user not found"), &ctx, &msg).await?;
 		}
 	} else {
-		msg.channel_id.say(&ctx,"Could not parse user").await?;
+		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -151,36 +148,10 @@ async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				)	
 			}).await?;
 		} else {
-			msg.channel_id.say(&ctx,"User not found").await?;
+			log_command(Log::Error("user not found"), &ctx, &msg).await?;
 		}
 	} else {
-		msg.channel_id.say(&ctx,"Could not parse user").await?;
-	}
-	Ok(())
-}
-
-#[command]
-#[aliases(avi, pfp,)]
-async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Ok(user_id) = UserId::from_str(args.message()) {
-		if let Ok(user) = user_id.to_user(&ctx).await {
-			let user_handle = user_handle(&user);
-			if let Some(avatar_url) = user.avatar_url()  {
-				msg.channel_id.send_message(&ctx, |m| {
-					m.embed(|e| e
-						.title(&user_handle)
-						.description(format!("Avatar for {}", &user_handle))
-						.image(&avatar_url)
-					)	
-				}).await?;
-			} else {
-				msg.channel_id.say(&ctx,format!("Could not retrieve avatar url for {}", user_handle)).await?;
-			}
-		} else {
-			msg.channel_id.say(&ctx,"User not found").await?;
-		}
-	} else {
-		msg.channel_id.say(&ctx,"Could not parse user").await?;
+		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
 	}
 	Ok(())
 }
