@@ -36,3 +36,5 @@ ___
 	```
 	diesel migration run
 	```
+1. Setup a "Muted" role with the permissions you want it to have
+1. Setup an "akane-logging" channel
