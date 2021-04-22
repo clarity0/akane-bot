@@ -4,7 +4,7 @@ use serenity::{client::{
         Context,
         bridge::gateway::ShardId,
     }, framework::standard::{Args, CommandResult, macros::{command, group,}}, model::{channel::Message, id::UserId}};
-use crate::{shard_manager, util::{user_handle,log_command, Log,}};
+use crate::{shard_manager, util::{log_command, Log,}};
 use shard_manager::ShardManagerContainer;
 #[group]
 #[only_in(guilds)]
@@ -49,17 +49,17 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 	if let Ok(user_id) = UserId::from_str(args.message()) {
 		if let Ok(user) = user_id.to_user(&ctx).await {
-			let user_handle = user_handle(&user);
+            let user_tag = user.tag();
 			if let Some(avatar_url) = user.avatar_url()  {
 				msg.channel_id.send_message(&ctx, |m| {
 					m.embed(|e| e
-						.title(&user_handle)
-						.description(format!("Avatar for {}", &user_handle))
+						.title(&user_tag)
+						.description(format!("Avatar for {}", &user_tag))
 						.image(&avatar_url)
 					)	
 				}).await?;
 			} else {
-				log_command(Log::Success(format!("could not retrieve avatar for user {}", &user_handle).as_str()), &ctx, &msg).await?;
+				log_command(Log::Success(format!("could not retrieve avatar for user {}", &user_tag).as_str()), &ctx, &msg).await?;
 			}
 		} else {
 			log_command(Log::Error("user not found"), &ctx, &msg).await?;
