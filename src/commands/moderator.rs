@@ -12,12 +12,12 @@ use serenity::{
 	},
 	utils::Color,
 };
-use crate::{database::*, util::*};
+use crate::{database::*, util::*, models::{Role,RoleAction}};
 
 #[group]
 #[allowed_roles("Moderator",)]
 #[only_in(guilds)]
-#[commands(ban,unban,mute,unmute,uinfo,)]
+#[commands(ban,unban,mute,unmute,gulag,ungulag,uinfo,)]
 struct Moderator;
 
 #[command]
@@ -74,35 +74,6 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 }
 
 #[command]
-#[aliases(silence,)]
-async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Ok(user_id) = UserId::from_str(args.message()) {
-		if let Ok(user) = user_id.to_user(&ctx).await {
-			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
-			let mut user_as_member = guild.member(&ctx, user_id).await?;
-			if let Some(role)  = guild.role_by_name("Muted") {
-				if let Err(err) = user_as_member.add_role(&ctx, role.id).await {
-					log_command(Log::Error(format!("could not mute user {} {}", user.tag(), err).as_str()), &ctx, &msg).await?;
-				} else {
-					if let Err(err) = log_mute(&user, guild) {
-						log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
-					} else {
-						log_command(Log::Success(format!("muted user {}", user.tag()).as_str()), &ctx, &msg).await?;
-					}
-				}
-			} else {
-				println!("Muted role does not exist");
-			}
-		} else {
-			log_command(Log::Error("user not found"), &ctx, &msg).await?;
-		}
-	} else {
-		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
-	}
-	Ok(())
-}
-
-#[command]
 #[aliases(repatriate,)]
 async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 	if let Ok(user_id) = UserId::from_str(args.message()) {
@@ -127,35 +98,29 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 }
 
 #[command]
+#[aliases(silence,)]
+async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	role_change(Role::Muted(RoleAction::Add), &ctx, &msg, &args).await?;
+	Ok(())
+}
+
+#[command]
+#[aliases(silence,)]
+async fn gulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	role_change(Role::Gulag(RoleAction::Add), &ctx, &msg, &args).await?;
+	Ok(())
+}
+
+#[command]
 #[aliases(unsilence,)]
 async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	if let Ok(user_id) = UserId::from_str(args.message()) {
-		if let Ok(user) = user_id.to_user(&ctx).await {
-			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
-			let mut user_as_member = guild.member(&ctx, user_id).await?;
-			if let Some(role) = guild.role_by_name("Muted") {
-				if !user_as_member.roles.contains(&role.id) {
-					log_command(Log::Error(format!("User {} is already not muted", user.tag()).as_str()), &ctx, &msg).await?;
-					return Ok(())
-				}
-				if let Err(err) = user_as_member.remove_role(&ctx, role.id).await {
-					msg.channel_id.say(ctx, format!("could not unmute user {}", user.tag())).await?;
-					println!("{}", err);
-				} else {
-					if let Err(err) = log_unmute(&user, guild) {
-						log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
-					} else {
-						log_command(Log::Success(format!("unmuted user {}", user.tag()).as_str()), &ctx, &msg).await?;
-					}
-				}
-			} else {
-				log_command(Log::Error("muted role does not exist"), &ctx, &msg).await?;
-			}
-		} else {
-			log_command(Log::Error("user not found"), &ctx, &msg).await?;
-		}
-	} else {
-		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
-	}
+	role_change(Role::Muted(RoleAction::Remove), &ctx, &msg, &args).await?;
+	Ok(())
+}
+
+#[command]
+#[aliases(unsilence,)]
+async fn ungulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	role_change(Role::Gulag(RoleAction::Remove), &ctx, &msg, &args).await?;
 	Ok(())
 }
