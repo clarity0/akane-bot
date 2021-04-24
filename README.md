@@ -23,11 +23,18 @@ Akane: Discord Bot written in Rust
 #### Avatar 
 `!avatar <user mention or id>`
 ___
-## Host yourself
-1. Clone repository and run cargo run on directory
-1. Setup a postgresql instance
-2. Setup your custom bot app on discord and obtain its token
-3. Create a .env file with the following data
+## Host yourself  for your own server
+1. Clone repository and build with cargo build
+	```
+	cargo build
+	```
+	or
+	```
+	cargo build --release
+	```
+3. Setup a postgresql instance
+4. Setup your custom bot app on discord and obtain its token
+5. Create a .env file with the following data
 	```
 	AKANE_BOT_TOKEN="YOUR BOT TOKEN"
 	DATABASE_URL=postgres://your@own/database
@@ -36,3 +43,5 @@ ___
 	```
 	diesel migration run
 	```
+1. Setup a "Muted" role with the permissions you want it to have
+1. Setup an "akane-logging" channel
