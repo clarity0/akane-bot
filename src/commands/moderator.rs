@@ -39,7 +39,7 @@ async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 					)
 					.color(Color::FABLED_PINK)
 				)	
-			}).await?;
+			}.reference_message(msg)).await?;
 		} else {
 			log_command(Log::Error("user not found"), &ctx, &msg).await?;
 		}

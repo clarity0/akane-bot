@@ -14,7 +14,8 @@ use serenity::{
     model::{
         channel::Message,
         id::UserId
-    }
+    },
+    utils::Color,
 };
 use crate::{shard_manager, util::{log_command, Log,}};
 use shard_manager::ShardManagerContainer;
@@ -69,8 +70,9 @@ async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 						.title(&user_tag)
 						.description(format!("Avatar for {}", &user_tag))
 						.image(&avatar_url)
+                        .color(Color::FABLED_PINK)
 					)	
-				}).await?;
+				}.reference_message(msg)).await?;
 			} else {
 				log_command(Log::Success(format!("could not retrieve avatar for user {}", &user_tag).as_str()), &ctx, &msg).await?;
 			}
