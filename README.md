@@ -5,17 +5,16 @@ Akane: Discord Bot written in Rust
 ##### prefix is !
 + Mute
 + Unmute
++ Gulag
++ Ungulag
 + Ban
 + Unban
 + Ping
 + Latency
 + Avatar
 
-#### Mute
+#### Mute/Gulag/Ban
 `!mute <user mention or id>`
-
-#### Ban
-`!ban <user mention or id>`
 
 #### Uinfo 
 `!uinfo <user mention or id>`
@@ -43,5 +42,5 @@ ___
 	```
 	diesel migration run
 	```
-1. Setup a "Muted" role with the permissions you want it to have
+1. Setup "Muted" and "Gulag" roles with the permissions you want them to have
 1. Setup an "akane-logging" channel
