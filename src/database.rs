@@ -1,7 +1,7 @@
 use chrono::Utc;
 use diesel::{prelude::*, result::Error};
 use serenity::model::{guild::Guild, prelude::User};
-use crate::{models::{Ban, Gulag, Mute, NewBan, NewGulag, NewMute, Role, RoleAction, LogType}};
+use crate::{models::{Ban, Gulag, Mute, NewBan, NewGulag, NewMute, Role, Action, LogType}};
 use crate::schema::{banlist,mutelist, gulaglist};
 
 pub fn establish_connection() -> Result<PgConnection, ConnectionError> {
@@ -19,14 +19,14 @@ impl Logging for Role {
 		match self {
 			Role::Muted(action) => {
 				match action {
-					RoleAction::Add => log_mute(user, guild).map(|_| ()),
-					RoleAction::Remove => log_unmute(user, guild).map(|_| ()),
+					Action::Add => log_mute(user, guild).map(|_| ()),
+					Action::Remove => log_unmute(user, guild).map(|_| ()),
 				}
 			}
 			Role::Gulag(action) => {
 				match action {
-					RoleAction::Add => log_gulag(user, guild).map(|_| ()),
-					RoleAction::Remove => log_ungulag(user, guild).map(|_| ()),
+					Action::Add => log_gulag(user, guild).map(|_| ()),
+					Action::Remove => log_ungulag(user, guild).map(|_| ()),
 				}
 			}
 		}
@@ -36,11 +36,11 @@ impl Logging for Role {
 		match self {
 			Role::Muted(action) => {
 				match action {
-					RoleAction::Add => match log_type {
+					Action::Add => match log_type {
 						LogType::Success => format!("muted user {}", user.tag()),
 						LogType::Error(err) => format!("could not mute user {} {}", user.tag(), err),
 					}
-					RoleAction::Remove => match log_type {
+					Action::Remove => match log_type {
 						LogType::Success => format!("unmuted user {}", user.tag()),
 						LogType::Error(err) => format!("could not mute user {} {}", user.tag(), err),
 					}
@@ -48,11 +48,11 @@ impl Logging for Role {
 			}
 			Role::Gulag(action) => {
 				match action {
-					RoleAction::Add => match log_type {
+					Action::Add => match log_type {
 						LogType::Success => format!("gulagged user {}", user.tag()),
 						LogType::Error(err) => format!("could not gulag user {}, {}", user.tag(), err),
 					}
-					RoleAction::Remove => match log_type {
+					Action::Remove => match log_type {
 						LogType::Success => format!("ungulagged user {}", user.tag()),
 						LogType::Error(err) => format!("could not ungulag user {}, {}", user.tag(), err),
 					}

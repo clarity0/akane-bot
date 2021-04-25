@@ -12,7 +12,7 @@ use serenity::{
 	},
 	utils::Color,
 };
-use crate::{database::*, util::*, models::{Role,RoleAction}};
+use crate::{database::*, util::*, models::{Role,Action}};
 
 #[group]
 #[allowed_roles("Moderator",)]
@@ -100,27 +100,27 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(silence,)]
 async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Muted(RoleAction::Add), &ctx, &msg, &args).await?;
+	role_change(Role::Muted(Action::Add), &ctx, &msg, &args).await?;
 	Ok(())
 }
 
 #[command]
 #[aliases(silence,)]
 async fn gulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Gulag(RoleAction::Add), &ctx, &msg, &args).await?;
+	role_change(Role::Gulag(Action::Add), &ctx, &msg, &args).await?;
 	Ok(())
 }
 
 #[command]
 #[aliases(unsilence,)]
 async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Muted(RoleAction::Remove), &ctx, &msg, &args).await?;
+	role_change(Role::Muted(Action::Remove), &ctx, &msg, &args).await?;
 	Ok(())
 }
 
 #[command]
 #[aliases(unsilence,)]
 async fn ungulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Gulag(RoleAction::Remove), &ctx, &msg, &args).await?;
+	role_change(Role::Gulag(Action::Remove), &ctx, &msg, &args).await?;
 	Ok(())
 }
