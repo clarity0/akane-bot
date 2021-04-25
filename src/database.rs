@@ -81,9 +81,9 @@ pub fn log_ban(user: &User, guild: Guild) -> Result<Ban, Error> {
 pub fn log_unban(user: &User, guild: Guild) -> Result<Ban, Error> {
 	if let Ok(conn) = establish_connection() {
 		diesel::delete(banlist::table)
-		.filter(banlist::user_id.eq(user.id.to_string()))
-		.filter(banlist::server_id.eq(guild.id.to_string()))
-		.get_result(&conn)
+			.filter(banlist::user_id.eq(user.id.to_string()))
+			.filter(banlist::server_id.eq(guild.id.to_string()))
+			.get_result(&conn)
 	} else {
 		Err(Error::__Nonexhaustive)
 	}
@@ -108,9 +108,9 @@ pub fn log_mute(user: &User, guild: Guild) -> Result<Mute, Error> {
 pub fn log_unmute(user: &User, guild: Guild) -> Result<Mute, Error> {
 	if let Ok(conn) = establish_connection() {
 		diesel::delete(mutelist::table)
-		.filter(mutelist::user_id.eq(user.id.to_string()))
-		.filter(mutelist::server_id.eq(guild.id.to_string()))
-		.get_result(&conn)
+			.filter(mutelist::user_id.eq(user.id.to_string()))
+			.filter(mutelist::server_id.eq(guild.id.to_string()))
+			.get_result(&conn)
 	} else {
 		Err(Error::__Nonexhaustive)
 	}
@@ -135,9 +135,9 @@ pub fn log_gulag(user: &User, guild: Guild) -> Result<Gulag, Error> {
 pub fn log_ungulag(user: &User, guild: Guild) -> Result<Gulag, Error> {
 	if let Ok(conn) = establish_connection() {
 		diesel::delete(gulaglist::table)
-		.filter(gulaglist::user_id.eq(user.id.to_string()))
-		.filter(gulaglist::server_id.eq(guild.id.to_string()))
-		.get_result(&conn)
+			.filter(gulaglist::user_id.eq(user.id.to_string()))
+			.filter(gulaglist::server_id.eq(guild.id.to_string()))
+			.get_result(&conn)
 	} else {
 		Err(Error::__Nonexhaustive)
 	}
