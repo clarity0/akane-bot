@@ -25,12 +25,17 @@ use shard_manager::ShardManagerContainer;
 #[commands(ping, latency, avatar,)]
 struct General;
 
+
+/// ### Ping command
+/// Replies to the command message with "pong!"
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    msg.channel_id.say(&ctx.http, "pong!").await?;
+    msg.reply(&ctx.http, "pong!").await?;
     Ok(())
 }
 
+/// ### Latency command
+/// Replies to the command message with the websocket latency
 #[command]
 async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let data = &ctx.data.read().await;
@@ -58,6 +63,12 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     Ok(())
 }
 
+/// ### Avatar command
+/// #### Aliases
+/// + avi
+/// + pfp
+///
+/// Replies to the command message with an embed of the argument user's avatar
 #[command]
 #[aliases(avi, pfp,)]
 async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {

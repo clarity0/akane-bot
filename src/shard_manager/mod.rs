@@ -13,6 +13,7 @@ impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 
+/// Output shards info and runner latency every minute to stdout
 pub fn shard_iterator_task(manager: Arc<Mutex<ShardManager>>) {
 	tokio::spawn(async move {
 		loop {

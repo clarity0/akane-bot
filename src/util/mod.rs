@@ -1,6 +1,6 @@
 use std::str::FromStr;
 use serenity::{Error, client::Context, framework::standard::{Args, CommandResult}, model::{channel::Message, guild::{Member}, id::{RoleId, UserId}}, utils::Color};
-use crate::{database::Logging, models::{LogType, Role, RoleAction}};
+use crate::{database::Logging, models::{LogType, Role, Action}};
 pub enum Log<'a> {
 	Success(&'a str),
 	Error(&'a str),
@@ -75,9 +75,9 @@ pub async fn role_change(role: Role, ctx: &Context, msg: &Message, args: &Args) 
 	Ok(())
 }
 
-async fn guild_role_change(role_action: RoleAction, ctx: &Context, member: &mut Member, role_id: &RoleId) -> Result<(), Error> {
+async fn guild_role_change(role_action: Action, ctx: &Context, member: &mut Member, role_id: &RoleId) -> Result<(), Error> {
 	match role_action {
-		RoleAction::Add => Ok(member.add_role(&ctx, role_id).await?),
-		RoleAction::Remove => Ok(member.remove_role(&ctx, role_id).await?),
+		Action::Add => Ok(member.add_role(&ctx, role_id).await?),
+		Action::Remove => Ok(member.remove_role(&ctx, role_id).await?),
 	}
 }
