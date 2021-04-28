@@ -12,7 +12,8 @@ use serenity::{
 	},
 	utils::Color,
 };
-use crate::{database::*, util::*, models::{Role,Action}};
+
+use crate::{database::bans::{log_ban, log_unban}, models::{log::{Log, LogType}, role::{Action, RoleAction, ServerRole}}, util::role_change};
 
 #[group]
 #[allowed_roles("Moderator",)]
@@ -41,10 +42,12 @@ async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				)	
 			}.reference_message(msg)).await?;
 		} else {
-			log_command(Log::Error("user not found"), &ctx, &msg).await?;
+            let message = format!("user not found");
+			Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 		}
 	} else {
-		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
+		let message = format!("bad user format");
+		Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -56,19 +59,26 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.ban(&ctx, &user, 0).await {
-				log_command(Log::Error(format!("could not ban user {} {}", user.tag(), err).as_str()), &ctx, &msg).await?;
+				let log_type = LogType::Error;
+				let message = format!("could not ban user {} {}", user.tag(), err);
+				Log{message: &message, log_type}.log_command(&ctx, &msg).await?;
 			} else {
 				if let Err(err) = log_ban(&user, guild) {
-					log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
+					let message = format!("could not update database {}", err);
+					Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 				} else {
-					log_command(Log::Success(format!("banned user {}", user.tag()).as_str()), &ctx, &msg).await?;
+					let log_type = LogType::Success;
+					let message = format!("banned user {}", user.tag());
+					Log{message: &message, log_type}.log_command(&ctx, &msg).await?;
 				}
 			}
 		} else {
-			log_command(Log::Error("user not found"), &ctx, &msg).await?;
+            let message = format!("user not found");
+			Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 		}
 	} else {
-		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
+		let message = format!("bad user format");
+		Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -80,19 +90,26 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.unban(&ctx, &user).await {
-				log_command(Log::Error(format!("could not unban user {} {}", user.tag(), err).as_str()), &ctx, &msg).await?;
+				let log_type = LogType::Error;
+				let message = format!("could not unban user {} {}", user.tag(), err);
+				Log{message: &message, log_type}.log_command(&ctx, &msg).await?;
 			} else {
 				if let Err(err) = log_unban(&user, guild) {
-					log_command(Log::Error(format!("could not update database {}", err).as_str()), &ctx, &msg).await?;
+					let message = format!("could not update database {}", err);
+					Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 				} else {
-					log_command(Log::Success(format!("unbanned user {}", user.tag()).as_str()), &ctx, &msg).await?;
+					let log_type = LogType::Success;
+					let message = format!("unbanned user {}", user.tag());
+					Log{message: &message, log_type}.log_command(&ctx, &msg).await?;
 				}
 			}
 		} else {
-			log_command(Log::Error("user not found"), &ctx, &msg).await?;
+            let message = format!("user not found");
+			Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 		}
 	} else {
-		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
+		let message = format!("bad user format");
+		Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 	}
 	Ok(())
 }
@@ -100,27 +117,43 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(silence,)]
 async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Muted(Action::Add), &ctx, &msg, &args).await?;
+	let role_action = RoleAction {
+		role: ServerRole::Muted,
+		action: Action::Add,
+	};
+	role_change(role_action, &ctx, &msg, &args).await?;
 	Ok(())
 }
 
 #[command]
-#[aliases(silence,)]
+#[aliases(fema,)]
 async fn gulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Gulag(Action::Add), &ctx, &msg, &args).await?;
+	let role_action = RoleAction {
+		role: ServerRole::Gulag,
+		action: Action::Add,
+	};
+	role_change(role_action, &ctx, &msg, &args).await?;
 	Ok(())
 }
 
 #[command]
 #[aliases(unsilence,)]
 async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Muted(Action::Remove), &ctx, &msg, &args).await?;
+	let role_action = RoleAction {
+		role: ServerRole::Muted,
+		action: Action::Remove,
+	};
+	role_change(role_action, &ctx, &msg, &args).await?;
 	Ok(())
 }
 
 #[command]
-#[aliases(unsilence,)]
+#[aliases(unfema,)]
 async fn ungulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-	role_change(Role::Gulag(Action::Remove), &ctx, &msg, &args).await?;
+	let role_action = RoleAction {
+		role: ServerRole::Gulag,
+		action: Action::Remove,
+	};
+	role_change(role_action, &ctx, &msg, &args).await?;
 	Ok(())
 }

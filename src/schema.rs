@@ -1,5 +1,5 @@
 table! {
-    banlist (user_id) {
+    bans (user_id) {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
@@ -8,7 +8,7 @@ table! {
 }
 
 table! {
-    gulaglist (user_id) {
+    gulags (user_id) {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
@@ -17,7 +17,7 @@ table! {
 }
 
 table! {
-    mutelist (user_id) {
+    mutes (user_id) {
         user_id -> Varchar,
         server_id -> Varchar,
         user_handle -> Varchar,
@@ -26,7 +26,7 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
-    banlist,
-    gulaglist,
-    mutelist,
+    bans,
+    gulags,
+    mutes,
 );

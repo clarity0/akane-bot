@@ -17,14 +17,13 @@ use serenity::{
     },
     utils::Color,
 };
-use crate::{shard_manager, util::{log_command, Log,}};
+use crate::{models::log::{Log, LogType}, shard_manager};
 use shard_manager::ShardManagerContainer;
 
 #[group]
 #[only_in(guilds)]
 #[commands(ping, latency, avatar,)]
 struct General;
-
 
 /// ### Ping command
 /// Replies to the command message with "pong!"
@@ -50,25 +49,22 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
                     let latency = latency.as_millis();
                     msg.reply(ctx, &format!("My latency is {} ms", latency)).await?;
                 } else {
-                    msg.reply(ctx, "Try again in 30 seconds").await?;
+                    let message = format!("wait until first socket poll");
+		            Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
                 }
             } else {
-                msg.reply(ctx,  "Error: No shard found").await?;
+                let message = format!("no shard found");
+		    Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
             }
         }
         None => {
-            msg.reply(ctx, "Error: There was a problem getting the shard manager").await?;
+            let message = format!("could not retrieve shard manager");
+		    Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
         }
     }
     Ok(())
 }
 
-/// ### Avatar command
-/// #### Aliases
-/// + avi
-/// + pfp
-///
-/// Replies to the command message with an embed of the argument user's avatar
 #[command]
 #[aliases(avi, pfp,)]
 async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
@@ -85,13 +81,16 @@ async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 					)	
 				}.reference_message(msg)).await?;
 			} else {
-				log_command(Log::Success(format!("could not retrieve avatar for user {}", &user_tag).as_str()), &ctx, &msg).await?;
+				let message = format!("could not retrieve avatar for {}", &user_tag);
+			    Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 			}
 		} else {
-			log_command(Log::Error("user not found"), &ctx, &msg).await?;
+            let message = format!("user not found");
+			Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 		}
 	} else {
-		log_command(Log::Error("bad user format"), &ctx, &msg).await?;
+		let message = format!("bad user format");
+		Log{message: &message, log_type: LogType::Error}.log_command(&ctx, &msg).await?;
 	}
 	Ok(())
 }
