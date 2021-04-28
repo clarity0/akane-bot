@@ -19,7 +19,7 @@ impl<'a> Log<'a> {
 				}).await?;
 			},
 			LogType::Error => {
-				let err_message = format!("ERROR {}", self.message);
+				let err_message = format!("Error: {}", self.message);
 				eprintln!("{}", err_message);
 				if let Ok(member) = cmd_msg.member(&ctx).await {
 					member.user.direct_message(&ctx, |m| m.content(&err_message)).await?;
