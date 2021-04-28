@@ -38,7 +38,7 @@ async fn main() {
     }
     shard_iterator_task(client.shard_manager.clone());
     
-    if let Err(msg) = client.start_shards(2).await {
+    if let Err(msg) = client.start_shards(1).await {
         println!("Error: {:?}", msg);
     }
 }
