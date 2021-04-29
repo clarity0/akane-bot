@@ -5,10 +5,12 @@ mod database;
 mod commands;
 mod handler;
 mod util;
+mod error;
+mod env;
 mod shard_manager;
 
-use std::{env::var, sync::Arc};
-use dotenv::dotenv;
+use std::{env::var, process, sync::Arc};
+use env::load_env;
 use serenity::{prelude::*, framework::StandardFramework};
 use commands::general::*;
 use commands::moderator::*;
@@ -17,8 +19,12 @@ use shard_manager::{ShardManagerContainer,shard_iterator_task};
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
-    let token = var("AKANE_BOT_TOKEN").expect("Bot token not found");
+    if let Err(err) = load_env() {
+        eprintln!("Error: {}", err);
+        process::exit(1);
+    } 
+    
+    let token = var("AKANE_BOT_TOKEN").unwrap();
 
     let framework = StandardFramework::new()
         .configure(|c | c

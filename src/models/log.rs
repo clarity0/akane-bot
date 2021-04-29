@@ -1,4 +1,6 @@
-use serenity::{framework::standard::CommandResult, model::{channel::Message, guild::Guild, prelude::User}, prelude::*, utils::Color};
+use std::str::FromStr;
+
+use serenity::{framework::standard::CommandResult, model::{channel::{Message}, guild::Guild, id::ChannelId, prelude::User}, prelude::*, utils::Color};
 pub enum LogType {
 	Success,
 	Error,
@@ -20,24 +22,29 @@ impl<'a> Log<'a> {
 			},
 			LogType::Error => {
 				let err_message = format!("Error: {}", self.message);
+				// Output to stderr
 				eprintln!("{}", err_message);
+
+				// DM command invoker
 				if let Ok(member) = cmd_msg.member(&ctx).await {
 					member.user.direct_message(&ctx, |m| m.content(&err_message)).await?;
 				}
-				if let Some(guild) = cmd_msg.guild(&ctx).await {
-					if let Some(channel_id) = guild.channel_id_from_name(&ctx, "akane-logging").await {
-						if let Some(avatar_url) = cmd_msg.author.avatar_url() {
-						let cmd_msg = cmd_msg.content_safe(&ctx).await;
-						channel_id.send_message(&ctx, |m| m
-							.embed(|e| e
-								.title("Command Error")
-								.description(&err_message)
-								.field("Command", cmd_msg, false)
-								.thumbnail(avatar_url)
-								.color(Color::RED)
-						)).await?;
-						}
-					}
+
+				// Log in logging channel
+				let log_channel_id = ChannelId::from_str(
+					std::env::var("AKANE_LOG_CHANNEL_ID").expect("Log channel ID not defined").as_str()
+				).expect("Invalid logging channel id");
+
+				if let Some(avatar_url) = cmd_msg.author.avatar_url() {
+					let cmd_msg = cmd_msg.content_safe(&ctx).await;
+					log_channel_id.send_message(&ctx, |m| m
+						.embed(|e| e
+							.title("Command Error")
+							.description(&err_message)
+							.field("Command", cmd_msg, false)
+							.thumbnail(avatar_url)
+							.color(Color::RED)
+					)).await?;
 				}
 			}
 		}
