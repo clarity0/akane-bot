@@ -28,10 +28,7 @@ struct Moderator;
 #[aliases(dox)]
 async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 	if let Ok(user_id) = UserId::from_str(args.message()) {
-		let guild = msg
-			.guild(&ctx.cache)
-			.await
-			.ok_or("Error retrieving guild")?;
+		let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 		if let Ok(member) = guild.member(&ctx, user_id).await {
 			msg.channel_id
 				.send_message(&ctx, |m| {
@@ -66,10 +63,7 @@ async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 	if let Ok(user_id) = UserId::from_str(args.message()) {
 		if let Ok(user) = user_id.to_user(&ctx).await {
-			let guild = msg
-				.guild(&ctx.cache)
-				.await
-				.ok_or("Error retrieving guild")?;
+			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.ban(&ctx, &user, 0).await {
 				let log_type = LogType::Error;
 				let message = format!("could not ban user {} {}", user.tag(), err);
@@ -107,10 +101,7 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 	if let Ok(user_id) = UserId::from_str(args.message()) {
 		if let Ok(user) = user_id.to_user(&ctx).await {
-			let guild = msg
-				.guild(&ctx.cache)
-				.await
-				.ok_or("Error retrieving guild")?;
+			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.unban(&ctx, &user).await {
 				let log_type = LogType::Error;
 				let message = format!("could not unban user {} {}", user.tag(), err);

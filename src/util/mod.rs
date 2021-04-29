@@ -24,19 +24,12 @@ pub async fn role_change(
 ) -> CommandResult {
 	if let Ok(user_id) = UserId::from_str(args.message()) {
 		if let Ok(user) = user_id.to_user(&ctx).await {
-			let guild = msg
-				.guild(&ctx.cache)
-				.await
-				.ok_or("Error retrieving guild")?;
+			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			let mut user_as_member = guild.member(&ctx, user_id).await?;
 			if let Some(guild_role) = guild.role_by_name(role_action.role.to_string().as_str()) {
-				if let Err(err) = guild_role_change(
-					&role_action.action,
-					ctx,
-					&mut user_as_member,
-					&guild_role.id,
-				)
-				.await
+				if let Err(err) =
+					guild_role_change(&role_action.action, ctx, &mut user_as_member, &guild_role.id)
+						.await
 				{
 					let log_type = LogType::Error;
 					let message = format!("{} {}", role_action.log_message(&log_type, &user), err);

@@ -42,8 +42,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 			if let Some(runner) = runners.get(&ShardId(ctx.shard_id)) {
 				if let Some(latency) = runner.latency {
 					let latency = latency.as_millis();
-					msg.reply(ctx, &format!("My latency is {} ms", latency))
-						.await?;
+					msg.reply(ctx, &format!("My latency is {} ms", latency)).await?;
 				} else {
 					let message = format!("wait until first socket poll");
 					Log {

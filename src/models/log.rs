@@ -24,8 +24,7 @@ impl<'a> Log<'a> {
 				cmd_msg
 					.channel_id
 					.send_message(&ctx, |m| {
-						m.content(format!("Success: {}", self.message))
-							.reference_message(cmd_msg)
+						m.content(format!("Success: {}", self.message)).reference_message(cmd_msg)
 					})
 					.await?;
 			}
@@ -36,10 +35,7 @@ impl<'a> Log<'a> {
 
 				// DM command invoker
 				if let Ok(member) = cmd_msg.member(&ctx).await {
-					member
-						.user
-						.direct_message(&ctx, |m| m.content(&err_message))
-						.await?;
+					member.user.direct_message(&ctx, |m| m.content(&err_message)).await?;
 				}
 
 				// Log in logging channel
