@@ -1,6 +1,7 @@
+use crate::error::Error;
 use std::str::FromStr;
-
 use serenity::{framework::standard::CommandResult, model::{channel::{Message}, guild::Guild, id::ChannelId, prelude::User}, prelude::*, utils::Color};
+
 pub enum LogType {
 	Success,
 	Error,
@@ -53,6 +54,6 @@ impl<'a> Log<'a> {
 }
 
 pub trait Logging {
-	fn log(&self, user: &User, guild: Guild) -> Result<(), diesel::result::Error>;
+	fn log(&self, user: &User, guild: Guild) -> Result<(), Error>;
 	fn log_message(&self, log_type: &LogType, user: &User) -> String;
 }

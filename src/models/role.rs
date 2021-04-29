@@ -15,7 +15,7 @@ pub struct RoleAction {
 
 use super::log::{LogType,Logging,};
 use serenity::model::{guild::Guild, prelude::User};
-use crate::database::{gulags::*,mutes::*,};
+use crate::{database::{gulags::*,mutes::*,}, error::Error};
 
 trait LogMessage {
 	fn message(&self, action: &Action, log_type: &LogType, user: &User) -> String;
@@ -50,7 +50,7 @@ impl LogMessage for ServerRole {
 
 
 impl Logging for RoleAction {
-	fn log(&self, user: &User, guild: Guild) -> Result<(), diesel::result::Error> {
+	fn log(&self, user: &User, guild: Guild) -> Result<(), Error> {
 		match self.role {
 			ServerRole::Muted => {
 				match self.action {
