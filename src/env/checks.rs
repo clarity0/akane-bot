@@ -39,7 +39,7 @@ pub fn check_akane_token() -> Result<(), Error> {
 
 pub fn check_database_connection() -> Result<(), Error> {
 	if let Err(err) = establish_connection() {
-		Err(Error::DatabaseError(err))
+		Err(err)
 	} else {
 		Ok(())
 	}

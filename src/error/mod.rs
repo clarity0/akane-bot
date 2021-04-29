@@ -7,6 +7,7 @@ pub enum Error {
 	EnvError(VarError),
 	UserParseError(UserIdParseError),
 	ChannelParseError(ChannelIdParseError),
+	QueryError(diesel::result::Error),
 }
 
 impl Display for Error {
@@ -16,6 +17,7 @@ impl Display for Error {
 		    Error::EnvError(err) => write!(f, "{}" , err),
 		    Error::UserParseError(err) => write!(f, "{}" , err),
 		    Error::ChannelParseError(err) => write!(f, "{}" , err),
+			Error::QueryError(err) => write!(f, "{}" , err),
 		}
 	}
 }
