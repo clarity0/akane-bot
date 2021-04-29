@@ -1,7 +1,7 @@
 use crate::{database::establish_connection, error::Error};
 
-use std::str::FromStr;
 use serenity::model::id::{ChannelId, UserId};
+use std::str::FromStr;
 
 pub fn check_akane_user_id() -> Result<(), Error> {
 	match std::env::var("AKANE_USER_ID") {
@@ -11,7 +11,7 @@ pub fn check_akane_user_id() -> Result<(), Error> {
 			} else {
 				Ok(())
 			}
-		},
+		}
 		Err(err) => Err(Error::EnvError(err)),
 	}
 }
@@ -24,7 +24,7 @@ pub fn check_akane_log_channel_id() -> Result<(), Error> {
 			} else {
 				Ok(())
 			}
-		},
+		}
 		Err(err) => Err(Error::EnvError(err)),
 	}
 }

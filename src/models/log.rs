@@ -1,13 +1,18 @@
 use crate::error::Error;
+use serenity::{
+	framework::standard::CommandResult,
+	model::{channel::Message, guild::Guild, id::ChannelId, prelude::User},
+	prelude::*,
+	utils::Color,
+};
 use std::str::FromStr;
-use serenity::{framework::standard::CommandResult, model::{channel::{Message}, guild::Guild, id::ChannelId, prelude::User}, prelude::*, utils::Color};
 
 pub enum LogType {
 	Success,
 	Error,
 }
 
-pub struct Log<'a> { 
+pub struct Log<'a> {
 	pub log_type: LogType,
 	pub message: &'a String,
 }
@@ -16,11 +21,14 @@ impl<'a> Log<'a> {
 	pub async fn log_command(&self, ctx: &Context, cmd_msg: &Message) -> CommandResult {
 		match &self.log_type {
 			LogType::Success => {
-				cmd_msg.channel_id.send_message(&ctx, |m| {
-					m.content(format!("Success: {}",self.message))
-					.reference_message(cmd_msg)
-				}).await?;
-			},
+				cmd_msg
+					.channel_id
+					.send_message(&ctx, |m| {
+						m.content(format!("Success: {}", self.message))
+							.reference_message(cmd_msg)
+					})
+					.await?;
+			}
 			LogType::Error => {
 				let err_message = format!("Error: {}", self.message);
 				// Output to stderr
@@ -28,24 +36,33 @@ impl<'a> Log<'a> {
 
 				// DM command invoker
 				if let Ok(member) = cmd_msg.member(&ctx).await {
-					member.user.direct_message(&ctx, |m| m.content(&err_message)).await?;
+					member
+						.user
+						.direct_message(&ctx, |m| m.content(&err_message))
+						.await?;
 				}
 
 				// Log in logging channel
 				let log_channel_id = ChannelId::from_str(
-					std::env::var("AKANE_LOG_CHANNEL_ID").expect("Log channel ID not defined").as_str()
-				).expect("Invalid logging channel id");
+					std::env::var("AKANE_LOG_CHANNEL_ID")
+						.expect("Log channel ID not defined")
+						.as_str(),
+				)
+				.expect("Invalid logging channel id");
 
 				if let Some(avatar_url) = cmd_msg.author.avatar_url() {
 					let cmd_msg = cmd_msg.content_safe(&ctx).await;
-					log_channel_id.send_message(&ctx, |m| m
-						.embed(|e| e
-							.title("Command Error")
-							.description(&err_message)
-							.field("Command", cmd_msg, false)
-							.thumbnail(avatar_url)
-							.color(Color::RED)
-					)).await?;
+					log_channel_id
+						.send_message(&ctx, |m| {
+							m.embed(|e| {
+								e.title("Command Error")
+									.description(&err_message)
+									.field("Command", cmd_msg, false)
+									.thumbnail(avatar_url)
+									.color(Color::RED)
+							})
+						})
+						.await?;
 				}
 			}
 		}
