@@ -12,3 +12,6 @@ tokio = { version = "1.5", features = ["full"] }
 dotenv = "0.15"
 diesel = { version = "1.4", features = ["postgres", "chrono"] }
 chrono = "0.4"
+
+[profile.release]
+lto = true
