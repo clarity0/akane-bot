@@ -44,7 +44,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 					let latency = latency.as_millis();
 					msg.reply(ctx, &format!("My latency is {} ms", latency)).await?;
 				} else {
-					let message = format!("wait until first socket poll");
+					let message = "wait until first socket poll".to_string();
 					Log {
 						message: &message,
 						log_type: LogType::Error,
@@ -53,7 +53,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 					.await?;
 				}
 			} else {
-				let message = format!("no shard found");
+				let message = "no shard found".to_string();
 				Log {
 					message: &message,
 					log_type: LogType::Error,
@@ -63,7 +63,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 			}
 		}
 		None => {
-			let message = format!("could not retrieve shard manager");
+			let message = "could not retrieve shard manager".to_string();
 			Log {
 				message: &message,
 				log_type: LogType::Error,

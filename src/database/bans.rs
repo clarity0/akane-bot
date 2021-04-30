@@ -19,7 +19,7 @@ pub fn log_ban(user: &User, guild: Guild) -> Result<Ban, Error> {
 			diesel::insert_into(bans::table)
 				.values(&new_ban)
 				.get_result(&conn)
-				.map_err(|err| Error::QueryError(err))
+				.map_err(Error::QueryError)
 		}
 		Err(err) => Err(err),
 	}
@@ -31,7 +31,7 @@ pub fn log_unban(user: &User, guild: Guild) -> Result<Ban, Error> {
 			.filter(bans::user_id.eq(user.id.to_string()))
 			.filter(bans::server_id.eq(guild.id.to_string()))
 			.get_result(&conn)
-			.map_err(|err| Error::QueryError(err)),
+			.map_err(Error::QueryError),
 		Err(err) => Err(err),
 	}
 }

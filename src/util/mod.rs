@@ -39,25 +39,23 @@ pub async fn role_change(
 					}
 					.log_command(&ctx, &msg)
 					.await?;
-				} else {
-					if let Err(err) = role_action.log(&user, guild) {
-						let message = format!("could not update database {}", err);
-						Log {
-							message: &message,
-							log_type: LogType::Error,
-						}
-						.log_command(&ctx, &msg)
-						.await?;
-					} else {
-						let log_type = LogType::Success;
-						let message = role_action.log_message(&log_type, &user);
-						Log {
-							message: &message,
-							log_type,
-						}
-						.log_command(&ctx, &msg)
-						.await?;
+				} else if let Err(err) = role_action.log(&user, guild) {
+					let message = format!("could not update database {}", err);
+					Log {
+						message: &message,
+						log_type: LogType::Error,
 					}
+					.log_command(&ctx, &msg)
+					.await?;
+				} else {
+					let log_type = LogType::Success;
+					let message = role_action.log_message(&log_type, &user);
+					Log {
+						message: &message,
+						log_type,
+					}
+					.log_command(&ctx, &msg)
+					.await?;
 				}
 			} else {
 				let message = format!("{} role not found", role_action.role.to_string());

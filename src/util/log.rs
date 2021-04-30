@@ -9,7 +9,7 @@ pub struct ErrorLog;
 
 impl ErrorLog {
 	pub async fn user_not_found(ctx: &Context, cmd_msg: &Message) -> CommandResult {
-		let message = format!("user not found");
+		let message = "user not found".to_string();
 		Log {
 			message: &message,
 			log_type: LogType::Error,
@@ -19,7 +19,7 @@ impl ErrorLog {
 		Ok(())
 	}
 	pub async fn bad_user_string(ctx: &Context, cmd_msg: &Message) -> CommandResult {
-		let message = format!("bad user string");
+		let message = "bad user string".to_string();
 		Log {
 			message: &message,
 			log_type: LogType::Error,
