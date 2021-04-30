@@ -19,7 +19,7 @@ pub fn log_gulag(user: &User, guild: Guild) -> Result<Gulag, Error> {
 			diesel::insert_into(gulags::table)
 				.values(&new_gulag)
 				.get_result(&conn)
-				.map_err(|err| Error::QueryError(err))
+				.map_err(Error::QueryError)
 		}
 		Err(err) => Err(err),
 	}
@@ -31,7 +31,7 @@ pub fn log_ungulag(user: &User, guild: Guild) -> Result<Gulag, Error> {
 			.filter(gulags::user_id.eq(user.id.to_string()))
 			.filter(gulags::server_id.eq(guild.id.to_string()))
 			.get_result(&conn)
-			.map_err(|err| Error::QueryError(err)),
+			.map_err(Error::QueryError),
 		Err(err) => Err(err),
 	}
 }

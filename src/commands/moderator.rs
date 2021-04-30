@@ -34,7 +34,7 @@ async fn uinfo(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				.send_message(&ctx, |m| {
 					{
 						m.embed(|e| {
-							e.title(format!("{}", member.distinct()))
+							e.title(member.distinct())
 								.description("User Info")
 								.thumbnail(member.user.avatar_url().unwrap())
 								.field("UserID", user_id.to_string(), false)
@@ -73,19 +73,17 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				}
 				.log_command(&ctx, &msg)
 				.await?;
+			} else if let Err(err) = log_ban(&user, guild) {
+				ErrorLog::could_not_update_database(&ctx, &msg, err).await?;
 			} else {
-				if let Err(err) = log_ban(&user, guild) {
-					ErrorLog::could_not_update_database(&ctx, &msg, err).await?;
-				} else {
-					let log_type = LogType::Success;
-					let message = format!("banned user {}", user.tag());
-					Log {
-						message: &message,
-						log_type,
-					}
-					.log_command(&ctx, &msg)
-					.await?;
+				let log_type = LogType::Success;
+				let message = format!("banned user {}", user.tag());
+				Log {
+					message: &message,
+					log_type,
 				}
+				.log_command(&ctx, &msg)
+				.await?;
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;
@@ -111,19 +109,17 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 				}
 				.log_command(&ctx, &msg)
 				.await?;
+			} else if let Err(err) = log_unban(&user, guild) {
+				ErrorLog::could_not_update_database(&ctx, &msg, err).await?;
 			} else {
-				if let Err(err) = log_unban(&user, guild) {
-					ErrorLog::could_not_update_database(&ctx, &msg, err).await?;
-				} else {
-					let log_type = LogType::Success;
-					let message = format!("unbanned user {}", user.tag());
-					Log {
-						message: &message,
-						log_type,
-					}
-					.log_command(&ctx, &msg)
-					.await?;
+				let log_type = LogType::Success;
+				let message = format!("unbanned user {}", user.tag());
+				Log {
+					message: &message,
+					log_type,
 				}
+				.log_command(&ctx, &msg)
+				.await?;
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;

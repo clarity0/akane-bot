@@ -39,12 +39,9 @@ impl<'a> Log<'a> {
 				}
 
 				// Log in logging channel
-				let log_channel_id = ChannelId::from_str(
-					std::env::var("AKANE_LOG_CHANNEL_ID")
-						.expect("Log channel ID not defined")
-						.as_str(),
-				)
-				.expect("Invalid logging channel id");
+				let log_channel_id =
+					ChannelId::from_str(std::env::var("AKANE_LOG_CHANNEL_ID").unwrap().as_str())
+						.unwrap();
 
 				if let Some(avatar_url) = cmd_msg.author.avatar_url() {
 					let cmd_msg = cmd_msg.content_safe(&ctx).await;

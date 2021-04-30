@@ -19,7 +19,7 @@ pub fn log_mute(user: &User, guild: Guild) -> Result<Mute, Error> {
 			diesel::insert_into(mutes::table)
 				.values(&new_mute)
 				.get_result(&conn)
-				.map_err(|err| Error::QueryError(err))
+				.map_err(Error::QueryError)
 		}
 		Err(err) => Err(err),
 	}
@@ -31,7 +31,7 @@ pub fn log_unmute(user: &User, guild: Guild) -> Result<Mute, Error> {
 			.filter(mutes::user_id.eq(user.id.to_string()))
 			.filter(mutes::server_id.eq(guild.id.to_string()))
 			.get_result(&conn)
-			.map_err(|err| Error::QueryError(err)),
+			.map_err(Error::QueryError),
 		Err(err) => Err(err),
 	}
 }
