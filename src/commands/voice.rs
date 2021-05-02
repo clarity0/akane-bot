@@ -41,13 +41,11 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-#[owners_only]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 	util::voice::join(&ctx, &msg).await
 }
 
 #[command]
-#[owners_only]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 	util::voice::leave(&ctx, &msg).await
 }

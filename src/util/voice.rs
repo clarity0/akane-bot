@@ -8,9 +8,10 @@ pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 	if let Some(channel_id) =
 		guild.voice_states.get(&msg.author.id).and_then(|voice_state| voice_state.channel_id)
 	{
+		println!("uwu 1");
 		let voice_manager =
 			songbird::get(ctx).await.ok_or("Error retrieving voice manager")?.clone();
-
+		println!("uwu 2");
 		// field 1 of tuple is the Result<...>
 		if let Err(err) = voice_manager.join(guild.id, channel_id).await.1 {
 			let message = format!("could not join voice channel {}", err);
