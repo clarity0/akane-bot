@@ -12,6 +12,7 @@ mod util;
 
 use commands::general::*;
 use commands::moderator::*;
+use commands::voice::*;
 use env::load_env;
 use handler::Handler;
 use serenity::{framework::StandardFramework, prelude::*};
@@ -30,7 +31,8 @@ async fn main() {
 	let framework = StandardFramework::new()
 		.configure(|c| c.prefix("!").delimiter(' '))
 		.group(&GENERAL_GROUP)
-		.group(&MODERATOR_GROUP);
+		.group(&MODERATOR_GROUP)
+		.group(&VOICE_GROUP);
 	let mut client = Client::builder(token)
 		.event_handler(Handler)
 		.framework(framework)
