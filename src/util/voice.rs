@@ -45,3 +45,26 @@ pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 	}
 	Ok(())
 }
+
+pub async fn deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
+	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
+
+	let voice_manager = songbird::get(ctx)
+		.await
+		.expect("Songbird Voice client placed in at initialisation.")
+		.clone();
+
+	if let Some(handler_lock) = voice_manager.get(guild.id) {
+		let mut handler = handler_lock.lock().await;
+
+		if let Err(e) = handler.deafen(deaf).await {
+			msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await?;
+		}
+
+		msg.channel_id.say(&ctx.http, "Deafened").await?;
+	} else {
+		msg.reply(ctx, "Not in a voice channel").await?;
+	}
+
+	Ok(())
+}

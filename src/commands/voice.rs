@@ -11,33 +11,17 @@ use crate::util;
 
 #[group]
 #[only_in(guilds)]
-#[commands(deafen, join, leave)]
+#[commands(deafen, undeafen, join, leave)]
 struct Voice;
 
 #[command]
 async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
-	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
+	util::voice::deafen(&ctx, &msg, true).await
+}
 
-	let voice_manager = songbird::get(ctx)
-		.await
-		.expect("Songbird Voice client placed in at initialisation.")
-		.clone();
-
-	if let Some(handler_lock) = voice_manager.get(guild.id) {
-		let mut handler = handler_lock.lock().await;
-
-		if handler.is_deaf() {
-			msg.channel_id.say(&ctx.http, "Already deafened").await?;
-		} else if let Err(e) = handler.deafen(true).await {
-			msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await?;
-		}
-
-		msg.channel_id.say(&ctx.http, "Deafened").await?;
-	} else {
-		msg.reply(ctx, "Not in a voice channel").await?;
-	}
-
-	Ok(())
+#[command]
+async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
+	util::voice::deafen(&ctx, &msg, false).await
 }
 
 #[command]
