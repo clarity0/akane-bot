@@ -34,7 +34,7 @@ async fn main() {
 		.group(&GENERAL_GROUP)
 		.group(&MODERATOR_GROUP)
 		.group(&VOICE_GROUP);
-		
+
 	let mut client = Client::builder(token)
 		.event_handler(Handler)
 		.framework(framework)
