@@ -16,7 +16,7 @@ use crate::{
 		log::{Log, LogType},
 		role::{Action, RoleAction, ServerRole},
 	},
-	util::{log::ErrorLog, role_change},
+	util::{log::ErrorLog, role::role_change},
 };
 
 #[group]

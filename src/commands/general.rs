@@ -1,4 +1,9 @@
-use crate::{akane_error, models::log::{Log, LogType}, shard_manager, util::log::ErrorLog};
+use crate::{
+	akane_error,
+	models::log::{Log, LogType},
+	shard_manager,
+	util::log::ErrorLog,
+};
 use serenity::{
 	client::{bridge::gateway::ShardId, Context},
 	framework::standard::{
