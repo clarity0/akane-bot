@@ -3,8 +3,7 @@ use serenity::{client::Context, framework::standard::CommandResult, model::chann
 use crate::models::log::{Log, LogType};
 
 pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
-	let guild = msg.guild(&ctx.cache).await.unwrap();
-	let guild_id = guild.id;
+	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 
 	if let Some(channel_id) =
 		guild.voice_states.get(&msg.author.id).and_then(|voice_state| voice_state.channel_id)
@@ -12,8 +11,8 @@ pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 		let voice_manager =
 			songbird::get(ctx).await.ok_or("Error retrieving voice manager")?.clone();
 
-		// field 1 is the Result<...>
-		if let Err(err) = voice_manager.join(guild_id, channel_id).await.1 {
+		// field 1 of tuple is the Result<...>
+		if let Err(err) = voice_manager.join(guild.id, channel_id).await.1 {
 			let message = format!("could not join voice channel {}", err);
 			Log {
 				message: &message,
@@ -27,6 +26,23 @@ pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 			.direct_message(&ctx, |m| m.content("You are not connected to any voice channel"))
 			.await?;
 	}
+	Ok(())
+}
 
+pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
+	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
+
+	let voice_manager =
+		songbird::get(ctx).await.ok_or("Error retrieving voice manager")?.clone();
+	
+	if let Err(err) = voice_manager.leave(guild.id).await {
+		let message = format!("could not leave voice channel {}", err);
+			Log {
+			message: &message,
+			log_type: LogType::Error,
+		}
+		.log_command(&ctx, &msg)
+		.await?;
+	}
 	Ok(())
 }

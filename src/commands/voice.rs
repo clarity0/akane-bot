@@ -7,9 +7,11 @@ use serenity::{
 	model::channel::Message,
 };
 
+use crate::util;
+
 #[group]
 #[only_in(guilds)]
-#[commands(deafen)]
+#[commands(deafen, join, leave,)]
 struct Voice;
 
 #[command]
@@ -36,4 +38,16 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 	}
 
 	Ok(())
+}
+
+#[command]
+#[owners_only]
+async fn join(ctx: &Context, msg: &Message) -> CommandResult {
+	util::voice::join(&ctx, &msg).await
+}
+
+#[command]
+#[owners_only]
+async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
+	util::voice::leave(&ctx, &msg).await
 }
