@@ -11,7 +11,7 @@ use crate::util;
 
 #[group]
 #[only_in(guilds)]
-#[commands(deafen, join, leave,)]
+#[commands(deafen, join, leave)]
 struct Voice;
 
 #[command]
