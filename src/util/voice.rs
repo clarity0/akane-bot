@@ -60,8 +60,6 @@ pub async fn deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
 		if let Err(e) = handler.deafen(deaf).await {
 			msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await?;
 		}
-
-		msg.channel_id.say(&ctx.http, "Deafened").await?;
 	} else {
 		msg.reply(ctx, "Not in a voice channel").await?;
 	}
