@@ -66,3 +66,24 @@ pub async fn deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
 
 	Ok(())
 }
+
+pub async fn akane_mute(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
+	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
+
+	let voice_manager = songbird::get(ctx)
+		.await
+		.expect("Songbird Voice client placed in at initialisation.")
+		.clone();
+
+	if let Some(handler_lock) = voice_manager.get(guild.id) {
+		let mut handler = handler_lock.lock().await;
+
+		if let Err(e) = handler.mute(deaf).await {
+			msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await?;
+		}
+	} else {
+		msg.reply(ctx, "Not in a voice channel").await?;
+	}
+
+	Ok(())
+}
