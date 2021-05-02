@@ -1,9 +1,6 @@
 use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
 
-use crate::{
-	akane_error,
-	models::log::{Log, LogType},
-};
+use crate::util::log::ErrorLog;
 
 pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
@@ -16,8 +13,8 @@ pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 
 		// field 1 of tuple is the Result<...>
 		if let Err(err) = voice_manager.join(guild.id, channel_id).await.1 {
-			let message = format!("could not join voice channel {}", err);
-			akane_error!(message, ctx, msg);
+			let err_msg = format!("could not join voice channel {}", err);
+			ErrorLog::other(&ctx, &msg, err_msg).await?;
 		}
 	} else {
 		msg.author
@@ -33,8 +30,8 @@ pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 	let voice_manager = songbird::get(ctx).await.ok_or("Error retrieving voice manager")?.clone();
 
 	if let Err(err) = voice_manager.leave(guild.id).await {
-		let message = format!("could not leave voice channel {}", err);
-		akane_error!(message, ctx, msg);
+		let err_msg = format!("could not leave voice channel {}", err);
+		ErrorLog::other(&ctx, &msg, err_msg).await?;
 	}
 	Ok(())
 }
@@ -50,8 +47,9 @@ pub async fn akane_deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandRe
 	if let Some(handler_lock) = voice_manager.get(guild.id) {
 		let mut handler = handler_lock.lock().await;
 
-		if let Err(e) = handler.deafen(deaf).await {
-			msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await?;
+		if let Err(err) = handler.deafen(deaf).await {
+			let err_msg = format!("could not change deafen status {}", err);
+			ErrorLog::other(&ctx, &msg, err_msg).await?;
 		}
 	} else {
 		msg.reply(ctx, "Not in a voice channel").await?;
@@ -71,8 +69,9 @@ pub async fn akane_mute(ctx: &Context, msg: &Message, deaf: bool) -> CommandResu
 	if let Some(handler_lock) = voice_manager.get(guild.id) {
 		let mut handler = handler_lock.lock().await;
 
-		if let Err(e) = handler.mute(deaf).await {
-			msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await?;
+		if let Err(err) = handler.mute(deaf).await {
+			let err_msg = format!("could not change mute status {}", err);
+			ErrorLog::other(&ctx, &msg, err_msg).await?;
 		}
 	} else {
 		msg.reply(ctx, "Not in a voice channel").await?;

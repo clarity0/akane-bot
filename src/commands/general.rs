@@ -1,9 +1,4 @@
-use crate::{
-	akane_error,
-	models::log::{Log, LogType},
-	shard_manager,
-	util::log::ErrorLog,
-};
+use crate::{shard_manager, util::log::ErrorLog};
 use serenity::{
 	client::{bridge::gateway::ShardId, Context},
 	framework::standard::{
@@ -45,17 +40,17 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 					let latency = latency.as_millis();
 					msg.reply(ctx, &format!("My latency is {} ms", latency)).await?;
 				} else {
-					let message = "wait until first socket poll".to_string();
-					akane_error!(message, ctx, msg);
+					let err_msg = "wait until first socket poll".to_string();
+					ErrorLog::other(&ctx, &msg, err_msg).await?;
 				}
 			} else {
-				let message = "no shard found".to_string();
-				akane_error!(message, ctx, msg);
+				let err_msg = "no shard found".to_string();
+				ErrorLog::other(&ctx, &msg, err_msg).await?;
 			}
 		}
 		None => {
-			let message = "could not retrieve shard manager".to_string();
-			akane_error!(message, ctx, msg);
+			let err_msg = "could not retrieve shard manager".to_string();
+			ErrorLog::other(&ctx, &msg, err_msg).await?;
 		}
 	}
 	Ok(())
@@ -82,8 +77,8 @@ async fn avatar(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 					})
 					.await?;
 			} else {
-				let message = format!("could not retrieve avatar for {}", &user_tag);
-				akane_error!(message, ctx, msg);
+				let err_msg = format!("could not retrieve avatar for {}", &user_tag);
+				ErrorLog::other(&ctx, &msg, err_msg).await?;
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;

@@ -26,4 +26,8 @@ impl ErrorLog {
 		akane_error!(message, ctx, cmd_msg);
 		Ok(())
 	}
+	pub async fn other(ctx: &Context, cmd_msg: &Message, err_msg: String) -> CommandResult {
+		akane_error!(err_msg, ctx, cmd_msg);
+		Ok(())
+	}
 }

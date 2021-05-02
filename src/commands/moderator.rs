@@ -10,7 +10,7 @@ use serenity::{
 use std::str::FromStr;
 
 use crate::{
-	akane_error, akane_success,
+	akane_success,
 	database::bans::{log_ban, log_unban},
 	models::{
 		log::{Log, LogType},
@@ -66,8 +66,8 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.ban(&ctx, &user, 0).await {
-				let message = format!("could not ban user {} {}", user.tag(), err);
-				akane_error!(message, ctx, msg);
+				let err_msg = format!("could not ban user {} {}", user.tag(), err);
+				ErrorLog::other(&ctx, &msg, err_msg).await?;
 			} else if let Err(err) = log_ban(&user, guild) {
 				ErrorLog::could_not_update_db(&ctx, &msg, err).await?;
 			} else {
@@ -90,8 +90,8 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.unban(&ctx, &user).await {
-				let message = format!("could not unban user {} {}", user.tag(), err);
-				akane_error!(message, ctx, msg);
+				let err_msg = format!("could not unban user {} {}", user.tag(), err);
+				ErrorLog::other(&ctx, &msg, err_msg).await?;
 			} else if let Err(err) = log_unban(&user, guild) {
 				ErrorLog::could_not_update_db(&ctx, &msg, err).await?;
 			} else {

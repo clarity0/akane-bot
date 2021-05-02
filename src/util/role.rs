@@ -1,4 +1,4 @@
-use crate::{akane_error, akane_success, err_log_message, succ_log_message};
+use crate::{akane_success, err_log_message, succ_log_message};
 
 use serenity::{
 	client::Context,
@@ -31,8 +31,8 @@ pub async fn role_change(
 					guild_role_change(&role_action.action, ctx, &mut user_as_member, &guild_role.id)
 						.await
 				{
-					let message = err_log_message!(role_action, user, err);
-					akane_error!(message, ctx, msg);
+					let err_msg = err_log_message!(role_action, user, err);
+					ErrorLog::other(&ctx, &msg, err_msg).await?;
 				} else if let Err(err) = role_action.log(&user, guild) {
 					ErrorLog::could_not_update_db(&ctx, &msg, err).await?;
 				} else {
@@ -40,8 +40,8 @@ pub async fn role_change(
 					akane_success!(message, ctx, msg);
 				}
 			} else {
-				let message = format!("{} role not found", role_action.role.to_string());
-				akane_error!(message, ctx, msg);
+				let err_msg = format!("{} role not found", role_action.role.to_string());
+				ErrorLog::other(&ctx, &msg, err_msg).await?;
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;
