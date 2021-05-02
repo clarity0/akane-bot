@@ -1,4 +1,5 @@
 pub mod log;
+pub mod voice;
 
 use serenity::{
 	client::Context,

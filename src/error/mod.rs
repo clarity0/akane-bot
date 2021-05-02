@@ -11,6 +11,9 @@ pub enum Error {
 	UserParseError(UserIdParseError),
 	ChannelParseError(ChannelIdParseError),
 	QueryError(diesel::result::Error),
+	//VoiceJoinError(songbird::error::JoinError),
+	//CommandError(serenity::framework::standard::CommandError),
+	//Other(String)
 }
 
 impl Display for Error {
@@ -21,6 +24,9 @@ impl Display for Error {
 			Error::UserParseError(err) => write!(f, "{}", err),
 			Error::ChannelParseError(err) => write!(f, "{}", err),
 			Error::QueryError(err) => write!(f, "{}", err),
+			//Error::VoiceJoinError(err) => write!(f, "{}", err),
+			//Error::CommandError(err) => write!(f, "{}", err),
+			//Error::Other(err) => write!(f, "{}", err),
 		}
 	}
 }

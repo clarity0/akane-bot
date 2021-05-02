@@ -137,8 +137,7 @@ async fn mute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		role: ServerRole::Muted,
 		action: Action::Add,
 	};
-	role_change(role_action, &ctx, &msg, &args).await?;
-	Ok(())
+	role_change(role_action, &ctx, &msg, &args).await
 }
 
 #[command]
@@ -148,8 +147,7 @@ async fn gulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		role: ServerRole::Gulag,
 		action: Action::Add,
 	};
-	role_change(role_action, &ctx, &msg, &args).await?;
-	Ok(())
+	role_change(role_action, &ctx, &msg, &args).await
 }
 
 #[command]
@@ -159,8 +157,7 @@ async fn unmute(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		role: ServerRole::Muted,
 		action: Action::Remove,
 	};
-	role_change(role_action, &ctx, &msg, &args).await?;
-	Ok(())
+	role_change(role_action, &ctx, &msg, &args).await
 }
 
 #[command]
@@ -170,6 +167,5 @@ async fn ungulag(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		role: ServerRole::Gulag,
 		action: Action::Remove,
 	};
-	role_change(role_action, &ctx, &msg, &args).await?;
-	Ok(())
+	role_change(role_action, &ctx, &msg, &args).await
 }
