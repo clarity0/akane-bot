@@ -1,6 +1,9 @@
 use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
 
-use crate::models::log::{Log, LogType};
+use crate::{
+	akane_error,
+	models::log::{Log, LogType},
+};
 
 pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
@@ -14,12 +17,7 @@ pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 		// field 1 of tuple is the Result<...>
 		if let Err(err) = voice_manager.join(guild.id, channel_id).await.1 {
 			let message = format!("could not join voice channel {}", err);
-			Log {
-				message: &message,
-				log_type: LogType::Error,
-			}
-			.log_command(&ctx, &msg)
-			.await?;
+			akane_error!(message, ctx, msg);
 		}
 	} else {
 		msg.author
@@ -36,12 +34,7 @@ pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 
 	if let Err(err) = voice_manager.leave(guild.id).await {
 		let message = format!("could not leave voice channel {}", err);
-		Log {
-			message: &message,
-			log_type: LogType::Error,
-		}
-		.log_command(&ctx, &msg)
-		.await?;
+		akane_error!(message, ctx, msg);
 	}
 	Ok(())
 }

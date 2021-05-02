@@ -13,9 +13,13 @@ use serenity::{
 };
 use std::str::FromStr;
 
-use crate::models::{
-	log::{Log, LogType, Logging},
-	role::{Action, RoleAction, ServerRole},
+use crate::{
+	akane_error, akane_success, err_log_message,
+	models::{
+		log::{Log, LogType, Logging},
+		role::{Action, RoleAction, ServerRole},
+	},
+	succ_log_message,
 };
 
 use self::log::ErrorLog;
@@ -32,40 +36,17 @@ pub async fn role_change(
 					guild_role_change(&role_action.action, ctx, &mut user_as_member, &guild_role.id)
 						.await
 				{
-					let log_type = LogType::Error;
-					let message = format!("{} {}", role_action.log_message(&log_type, &user), err);
-					Log {
-						message: &message,
-						log_type,
-					}
-					.log_command(&ctx, &msg)
-					.await?;
+					let message = err_log_message!(role_action, user, err);
+					akane_error!(message, ctx, msg);
 				} else if let Err(err) = role_action.log(&user, guild) {
-					let message = format!("could not update database {}", err);
-					Log {
-						message: &message,
-						log_type: LogType::Error,
-					}
-					.log_command(&ctx, &msg)
-					.await?;
+					ErrorLog::could_not_update_db(&ctx, &msg, err).await?;
 				} else {
-					let log_type = LogType::Success;
-					let message = role_action.log_message(&log_type, &user);
-					Log {
-						message: &message,
-						log_type,
-					}
-					.log_command(&ctx, &msg)
-					.await?;
+					let message = succ_log_message!(role_action, user);
+					akane_success!(message, ctx, msg);
 				}
 			} else {
 				let message = format!("{} role not found", role_action.role.to_string());
-				Log {
-					message: &message,
-					log_type: LogType::Error,
-				}
-				.log_command(&ctx, &msg)
-				.await?;
+				akane_error!(message, ctx, msg);
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;

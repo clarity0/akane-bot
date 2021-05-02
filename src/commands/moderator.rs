@@ -10,6 +10,7 @@ use serenity::{
 use std::str::FromStr;
 
 use crate::{
+	akane_error, akane_success,
 	database::bans::{log_ban, log_unban},
 	models::{
 		log::{Log, LogType},
@@ -65,25 +66,13 @@ async fn ban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.ban(&ctx, &user, 0).await {
-				let log_type = LogType::Error;
 				let message = format!("could not ban user {} {}", user.tag(), err);
-				Log {
-					message: &message,
-					log_type,
-				}
-				.log_command(&ctx, &msg)
-				.await?;
+				akane_error!(message, ctx, msg);
 			} else if let Err(err) = log_ban(&user, guild) {
-				ErrorLog::could_not_update_database(&ctx, &msg, err).await?;
+				ErrorLog::could_not_update_db(&ctx, &msg, err).await?;
 			} else {
-				let log_type = LogType::Success;
 				let message = format!("banned user {}", user.tag());
-				Log {
-					message: &message,
-					log_type,
-				}
-				.log_command(&ctx, &msg)
-				.await?;
+				akane_success!(message, ctx, msg);
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;
@@ -101,25 +90,13 @@ async fn unban(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 		if let Ok(user) = user_id.to_user(&ctx).await {
 			let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 			if let Err(err) = guild.unban(&ctx, &user).await {
-				let log_type = LogType::Error;
 				let message = format!("could not unban user {} {}", user.tag(), err);
-				Log {
-					message: &message,
-					log_type,
-				}
-				.log_command(&ctx, &msg)
-				.await?;
+				akane_error!(message, ctx, msg);
 			} else if let Err(err) = log_unban(&user, guild) {
-				ErrorLog::could_not_update_database(&ctx, &msg, err).await?;
+				ErrorLog::could_not_update_db(&ctx, &msg, err).await?;
 			} else {
-				let log_type = LogType::Success;
 				let message = format!("unbanned user {}", user.tag());
-				Log {
-					message: &message,
-					log_type,
-				}
-				.log_command(&ctx, &msg)
-				.await?;
+				akane_success!(message, ctx, msg);
 			}
 		} else {
 			ErrorLog::user_not_found(&ctx, &msg).await?;
