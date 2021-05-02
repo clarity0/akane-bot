@@ -30,3 +30,41 @@ impl Display for Error {
 		}
 	}
 }
+
+#[macro_export]
+macro_rules! akane_error {
+	($message:expr, $ctx:expr, $msg:expr) => {
+		Log {
+			message: &$message,
+			log_type: LogType::Error,
+		}
+		.log_command(&$ctx, &$msg)
+		.await?;
+	};
+}
+
+#[macro_export]
+macro_rules! akane_success {
+	($message:expr, $ctx:expr, $msg:expr) => {
+		Log {
+			message: &$message,
+			log_type: LogType::Success,
+		}
+		.log_command(&$ctx, &$msg)
+		.await?;
+	};
+}
+
+#[macro_export]
+macro_rules! err_log_message {
+	($role_action:expr, $user:expr, $err:expr) => {
+		format!("{} {}", $role_action.log_message(&LogType::Error, &$user), $err)
+	};
+}
+
+#[macro_export]
+macro_rules! succ_log_message {
+	($role_action:expr, $user:expr) => {
+		$role_action.log_message(&LogType::Error, &$user)
+	};
+}
