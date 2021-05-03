@@ -65,6 +65,6 @@ macro_rules! err_log_message {
 #[macro_export]
 macro_rules! succ_log_message {
 	($role_action:expr, $user:expr) => {
-		$role_action.log_message(&LogType::Error, &$user)
+		$role_action.log_message(&LogType::Success, &$user)
 	};
 }

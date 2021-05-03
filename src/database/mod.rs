@@ -31,7 +31,7 @@ macro_rules! log_add {
 				}
 				Err(err) => Err(err),
 			}
-		}	
+		}
 	};
 }
 
@@ -47,6 +47,6 @@ macro_rules! log_remove {
 					.map_err(Error::QueryError),
 				Err(err) => Err(err),
 			}
-		}	
+		}
 	};
 }
