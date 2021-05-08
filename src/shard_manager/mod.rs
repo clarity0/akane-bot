@@ -13,7 +13,7 @@ impl TypeMapKey for ShardManagerContainer {
 pub fn shard_iterator_task(manager: Arc<Mutex<ShardManager>>) {
 	tokio::spawn(async move {
 		loop {
-			sleep(Duration::from_secs(60)).await;
+			sleep(Duration::from_secs(120)).await;
 
 			let lock = manager.lock().await;
 			let shard_runners = lock.runners.lock().await;
