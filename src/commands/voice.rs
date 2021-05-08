@@ -1,17 +1,10 @@
-use serenity::{
-	client::Context,
-	framework::standard::{
-		macros::{command, group},
-		CommandResult,
-	},
-	model::channel::Message,
-};
+use serenity::{client::Context, framework::standard::{Args, CommandResult, macros::{command, group}}, model::channel::Message};
 
 use crate::util;
 
 #[group]
 #[only_in(guilds)]
-#[commands(deafen, undeafen, akanemute, akaneunmute, join, leave)]
+#[commands(music, deafen, undeafen, akanemute, akaneunmute, join, leave)]
 struct Voice;
 
 #[command]
@@ -42,4 +35,25 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 	util::voice::leave(&ctx, &msg).await
+}
+
+#[command]
+#[sub_commands(play, pause, stop,)]
+async fn music(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	Ok(())
+}
+
+#[command]
+async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	Ok(())
+}
+
+#[command]
+async fn pause(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	Ok(())
+}
+
+#[command]
+async fn stop(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+	Ok(())
 }

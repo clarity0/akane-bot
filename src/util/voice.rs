@@ -1,4 +1,5 @@
-use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
+use serenity::{client::Context, framework::standard::{Args, CommandResult}, model::channel::Message};
+use songbird::input;
 
 use crate::util::log::ErrorLog;
 
@@ -78,4 +79,34 @@ pub async fn akane_mute(ctx: &Context, msg: &Message, deaf: bool) -> CommandResu
 	}
 
 	Ok(())
+}
+
+pub async fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+    let url = args.single::<String>()?;
+    let guild = msg.guild(&ctx.cache).await.ok_or("guild")?;
+
+    let manager = songbird::get(ctx)
+        .await
+        .expect("Songbird Voice client placed in at initialisation.")
+        .clone();
+
+    if let Some(handler_lock) = manager.get(guild.id) {
+        let mut handler = handler_lock.lock().await;
+
+        let source = match input::ytdl(&url).await {
+            Ok(source) => source,
+            Err(why) => {
+                println!("Err starting source: {:?}", why);
+                return Ok(());
+            },
+        };
+
+        let song = handler.play_source(source);
+        let _send_http = ctx.http.clone();
+        let _chan_id = msg.channel_id;
+
+		println!("playing song");
+    }
+
+    Ok(())
 }
