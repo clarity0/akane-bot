@@ -1,6 +1,6 @@
 [package]
 name = "akane-bot"
-version = "0.2.5"
+version = "0.2.9"
 authors = ["clarity"]
 edition = "2018"
 
@@ -12,7 +12,7 @@ tokio = { version = "1.5", features = ["full"] }
 dotenv = "0.15"
 diesel = { version = "1.4", features = ["postgres", "chrono"] }
 chrono = "0.4"
-songbird = "0.1.6"
+songbird = { version = "0.1.6", features = ["builtin-queue"] }
 
 [profile.release]
 lto = true

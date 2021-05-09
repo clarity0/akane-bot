@@ -36,7 +36,7 @@ pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 	Ok(())
 }
 
-pub async fn akane_deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
+pub async fn deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
 	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 
 	let voice_manager = songbird::get(ctx)
@@ -58,7 +58,7 @@ pub async fn akane_deafen(ctx: &Context, msg: &Message, deaf: bool) -> CommandRe
 	Ok(())
 }
 
-pub async fn akane_mute(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
+pub async fn mute(ctx: &Context, msg: &Message, deaf: bool) -> CommandResult {
 	let guild = msg.guild(&ctx.cache).await.ok_or("Error retrieving guild")?;
 
 	let voice_manager = songbird::get(ctx)
