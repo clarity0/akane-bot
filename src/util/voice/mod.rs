@@ -12,10 +12,8 @@ struct VoiceManager;
 
 impl VoiceManager {
 	pub async fn get(ctx: &Context) -> Result<Arc<Songbird>, Error> {
-		let voice_manager = songbird::get(ctx)
+		songbird::get(ctx)
 			.await
-			.ok_or(Error::VoiceManagerError("Could not retrieve voice manager".to_string()));
-
-		voice_manager.map(|v| v.clone())
+			.ok_or_else(|| Error::VoiceManagerError("Could not retrieve voice manager".to_string()))
 	}
 }

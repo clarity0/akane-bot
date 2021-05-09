@@ -1,6 +1,6 @@
 [package]
 name = "akane-bot"
-version = "0.2.5"
+version = "0.2.9"
 authors = ["clarity"]
 edition = "2018"
 
